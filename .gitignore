@@ -1,2 +1,3 @@
 *build*
 *-checkpoint.ipynb
+.cache/*

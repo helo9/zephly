@@ -1,10 +1,6 @@
-find_package(Catch2 3 REQUIRED)
+cmake_minimum_required(VERSION 3.20)
 
-add_executable(tests lib/tests.cpp)
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+project(AttitudeEstimation)
 
-add_library(ahrs lib/ahrs.cpp)
-
-add_executable(example lib/example.c)
-target_link_libraries(example PRIVATE ahrs)
+add_subdirectory(app)
 
