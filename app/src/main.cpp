@@ -7,7 +7,7 @@
 
 #include <attitude_propagation.hpp>
 
-#define SAMPLING_FREQUENCY 200.0
+#define SAMPLING_FREQUENCY 400.0
 
 using namespace ahrs;
 
@@ -34,7 +34,7 @@ int main() {
       continue;
     }
 
-    propagate_attitude<double>(q, w, delta_t);
+    propagate_attitude<double>(q, w, delta_t/1e3);
 
     report_state(q, w);
 
@@ -86,8 +86,6 @@ bool update_measurements(const struct device *gyro,
     rotation_speed.data[i] = sensor_value_to_double(&gyro_measurement[i]) / 1e3;
   }
 
-  delta_t = 0.01;
-
   int64_t now = k_uptime_get();
   if ( last_time != 0 ) {
     delta_t = (now - last_time);
@@ -102,6 +100,6 @@ bool update_measurements(const struct device *gyro,
 
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w) {
   /* float norm = q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z; */
-  //printf("%f %f %f %f \n", q.w, q.x, q.y, q.z);
-  printf("%f %f %f \n", w.data[0], w.data[1], w.data[2]);
+  printf("%f %f %f %f", q.w, q.x, q.y, q.z);
+  printf(" %lld %f %f %f \n", k_uptime_get(), w.data[0], w.data[1], w.data[2]);
 }
