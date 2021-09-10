@@ -1,0 +1,13 @@
+manifest:
+  remotes:
+    - name: zephyrproject-rots
+      url-base: https://github.com/zephyrproject-rtos
+    - name: custom-zephyr
+      url-base: https://github.com/helo9
+  projects:
+    - name: zephyr
+      remote: custom-zephyr
+      revision: i3g4250_extended_support
+      import: true
+  self:
+    path: attitude_estimation
