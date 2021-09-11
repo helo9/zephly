@@ -50,8 +50,6 @@ void propagate_attitude(Quaternion<T> &attitude, const Vector<T, 3> &rotation_sp
   const T norm = sqrt(attitude.w * attitude.w + attitude.x * attitude.x +
                     attitude.y * attitude.y + attitude.z * attitude.z);
 
-  const T tmp = norm - 1.0;
-
   attitude.w /= norm;
   attitude.x /= norm;
   attitude.y /= norm;
