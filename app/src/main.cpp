@@ -7,7 +7,8 @@
 
 #include <attitude_propagation.hpp>
 
-#define SAMPLING_FREQUENCY 400.0
+constexpr double SAMPLING_FREQUENCY = 400.0;
+constexpr double DEG2RAD = 0.017453292519943295;
 
 using namespace ahrs;
 
@@ -34,7 +35,7 @@ int main() {
       continue;
     }
 
-    propagate_attitude<double>(q, w, delta_t/1e3);
+    propagate_attitude<double>(q, w, delta_t);
 
     report_state(q, w);
 
@@ -83,12 +84,12 @@ bool update_measurements(const struct device *gyro,
   }
 
   for (int i = 0; i < 3; i++) {
-    rotation_speed.data[i] = sensor_value_to_double(&gyro_measurement[i]) / 1e3;
+    rotation_speed.data[i] = sensor_value_to_double(&gyro_measurement[i]) * DEG2RAD;
   }
 
   int64_t now = k_uptime_get();
   if ( last_time != 0 ) {
-    delta_t = (now - last_time);
+    delta_t = (now - last_time) / 1e3;
     last_time = now;
   } else {
     last_time = now;
