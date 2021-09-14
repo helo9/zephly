@@ -1,102 +1,44 @@
+#include "sensors.hpp"
 #include "kernel.h"
 #include <device.h>
-#include <drivers/sensor.h>
 #include <stdio.h>
 #include <zephyr.h>
 #include <math.h>
 
 #include <attitude_propagation.hpp>
 
-constexpr double SAMPLING_FREQUENCY = 400.0;
 constexpr double DEG2RAD = 0.017453292519943295;
 
 using namespace ahrs;
 
-bool initialize_sensors(const struct device *gyro);
-bool update_measurements(const struct device *gyro,
-                         Vector<double, 3> &rotation_speed, double &delta_t);
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w);
 
 int main() {
-  /* TODO: Find solution to get by device name */
-  const struct device *gyro = DEVICE_DT_GET_ONE(st_i3g4250d);
-
-  Quaternion<double> q = {1.0, 0.0, 0.0, 0.0};
-  Vector<double, 3> w = {0.0, 0.0, 0.0};
-  double delta_t = 1.0;
-
-  if (!initialize_sensors(gyro)) {
+  if (!initialize_sensors()) {
     return -1;
   }
 
+  /* initial attitude */
+  Quaternion<double> q = {1.0, 0.0, 0.0, 0.0};
+
   while (true) {
-    if (!update_measurements(gyro, w, delta_t)) {
+    if (!update_measurements()) {
       /* Something went wrong, try again */
       continue;
     }
 
-    propagate_attitude<double>(q, w, delta_t);
+    propagate_attitude<double>(q, get_rotation_speed(), get_delta_t());
 
-    report_state(q, w);
+    //report_state(q, get_rotation_speed());
+
+    auto tmp = get_mag_field();
+
+    printf("%f\t%f\t%f\n", tmp.data[0], tmp.data[1], tmp.data[2]);
 
     k_sleep(K_MSEC(10));
   }
 
   return 0;
-}
-
-bool initialize_sensors(const struct device *gyro) {
-  /* ensure device is ready */
-  if (!device_is_ready(gyro)) {
-    return false;
-  }
-
-  /* ensure correct sampling frequency */
-  struct sensor_value setting;
-  sensor_value_from_double(&setting, SAMPLING_FREQUENCY);
-
-  int rc = sensor_attr_set(gyro, SENSOR_CHAN_GYRO_XYZ,
-                           SENSOR_ATTR_SAMPLING_FREQUENCY, &setting);
-
-  if (rc != 0) {
-    return false;
-  }
-
-  return true;
-}
-
-bool update_measurements(const struct device *gyro,
-                         Vector<double, 3> &rotation_speed, double &delta_t) {
-  static int64_t last_time = 0;
-
-  struct sensor_value gyro_measurement[3];
-
-  int rc = sensor_sample_fetch(gyro);
-
-  if (rc != 0) {
-    return false;
-  }
-
-  rc = sensor_channel_get(gyro, SENSOR_CHAN_GYRO_XYZ, gyro_measurement);
-
-  if (rc != 0) {
-    return false;
-  }
-
-  for (int i = 0; i < 3; i++) {
-    rotation_speed.data[i] = sensor_value_to_double(&gyro_measurement[i]) * DEG2RAD;
-  }
-
-  int64_t now = k_uptime_get();
-  if ( last_time != 0 ) {
-    delta_t = (now - last_time) / 1e3;
-    last_time = now;
-  } else {
-    last_time = now;
-    return false;
-  }
-
-  return true;
 }
 
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w) {
