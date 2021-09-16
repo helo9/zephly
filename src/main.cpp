@@ -29,11 +29,11 @@ int main() {
 
     propagate_attitude<double>(q, get_rotation_speed(), get_delta_t());
 
-    //report_state(q, get_rotation_speed());
+    report_state(q, get_rotation_speed());
 
-    auto tmp = get_mag_field();
+    //auto tmp = get_mag_field();
 
-    printf("%f\t%f\t%f\n", tmp.data[0], tmp.data[1], tmp.data[2]);
+    //printf("%f\t%f\t%f\n", tmp.data[0], tmp.data[1], tmp.data[2]);
 
     k_sleep(K_MSEC(10));
   }
