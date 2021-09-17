@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include <attitude_propagation.hpp>
+#include "settings.hpp"
 
 constexpr double DEG2RAD = 0.017453292519943295;
 
@@ -17,6 +18,8 @@ int main() {
   if (!initialize_sensors()) {
     return -1;
   }
+
+  Settings::getInstance();//.init();
 
   /* initial attitude */
   Quaternion<double> q = {1.0, 0.0, 0.0, 0.0};

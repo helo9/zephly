@@ -9,3 +9,10 @@ add_subdirectory(lib)
 # find_package(Zephyr) which defines the target.
 target_sources(app PRIVATE src/main.cpp src/sensors.cpp)
 target_link_libraries(app PRIVATE ahrs)
+
+# disable exceptions
+# to mitigate problems with static variable initialization guards
+# call __cxa_guard_acquire and __cxa_guard_release
+# see https://github.com/bblanchon/ArduinoJson/issues/356
+# not thread safe anymore :(
+target_compile_options(app BEFORE PUBLIC -fno-threadsafe-statics)
