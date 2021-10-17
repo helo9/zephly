@@ -40,6 +40,9 @@ private:
 
 
 class Settings {
+	
+	static constexpr size_t STORAGE_SIZE = 15;
+
 public:
 	static Settings& getInstance(){
 		static Settings instance;
@@ -60,14 +63,35 @@ public:
 			}
 		}
 		return default_value;
+	}
+
+	template<class T>
+	const T define(const char str[], T default_value) {
+		/* Try to find param */
+		size_t i = 0;
+		for (auto param : _storage) {
+			if (std::strcmp(str, param.name) == 0) {
+				return param.select_member<T>();
+			}
+
+			/* there are no further parameters saved, abort */
+			if (i++ > _storage_position) {
+				break;
+			}
+		}
+
+		/* Add entry */
+		_storage[_storage_position++] = Parameter::create_parameter(str, default_value);
 		
+		return default_value;
 	}
 private:
 	Settings() {}
 
 	float param1=1.0f;
 
-	Parameter _storage[15];
+	Parameter _storage[STORAGE_SIZE];
+	size_t _storage_position = 0;
 };
 
 constexpr auto settings = Settings::getInstance;

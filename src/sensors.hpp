@@ -10,13 +10,15 @@ union Sensors {
     struct {
         const struct device* gyro;
         const struct device* mag;
+        const struct device* accel;
     };
-    const struct device* array[2];
+    const struct device* array[3];
 };
 
 struct Measurements {
     ahrs::Vector<double, 3> rotation_speed;
     ahrs::Vector<double, 3> mag_field;
+    ahrs::Vector<double, 3> accelerations;
     double delta_t;
 };
 
@@ -26,6 +28,7 @@ bool update_measurements();
 
 const ahrs::Vector<double, 3>& get_rotation_speed();
 const ahrs::Vector<double, 3>& get_mag_field();
+const ahrs::Vector<double, 3>& get_accelerations();
 const double& get_delta_t();
 
 #endif /* SENSORS_HPP */
