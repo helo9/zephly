@@ -7,18 +7,25 @@
 
 #include <attitude_propagation.hpp>
 #include "settings.hpp"
+#include "pwm.hpp"
 
 constexpr double DEG2RAD = 0.017453292519943295;
 
 using namespace ahrs;
 
+const float outputs[] = {0.5f, 0.5f, 0.5f, 0.5f};
+
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w, const Vector<double, 3> &a);
 
 int main() {
-  if (!initialize_sensors()) {
+
+
+  if (!initialize_sensors() || !pwm().is_ready()) {
     printk("Initialization failed!");
     return -1;
   }
+
+  pwm().write(outputs);
 
   /* initial attitude */
   Quaternion<double> q = {1.0, 0.0, 0.0, 0.0};
