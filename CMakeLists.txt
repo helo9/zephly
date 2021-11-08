@@ -1,12 +1,14 @@
 # Find Zephyr. This also loads Zephyr's build system.
 cmake_minimum_required(VERSION 3.20)
+
+set(BOARD_ROOT ${CMAKE_CURRENT_LIST_DIR})
+
 find_package(Zephyr)
 project(attitude_estimation)
 
 option(BUILD_EXPERIMENT "Build experiment programs" OFF)
 
 add_subdirectory(lib)
-
 
 if ("${BOARD}" STREQUAL "qemu_cortex_m3")
     target_sources(app PRIVATE src/main_qemu.cpp src/settings.cpp)

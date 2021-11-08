@@ -1,0 +1,8 @@
+# OpenPilot CC3D board configuration
+#
+# Copyright (c) 2021 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_OPENPILOT_CC3D
+	bool "OpenPilot CC3D board"
+	depends on SOC_STM32F103XB
