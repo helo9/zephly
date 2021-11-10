@@ -1,14 +1,14 @@
 #include <tuple>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include "attitude_propagation.hpp"
+#include "attitude_estimation.hpp"
 
 using namespace std;
 
 namespace py = pybind11;
 
-using Quaternion = ahrs::Quaternion<double>;
-using Vector = ahrs::Vector<double, 3>;
+using Quaterniond = AttitudeEstimation::Quaternion<double>;
+using Vector3d = AttitudeEstimation::Vector<double, 3>;
 
 py::array_t<double> propagate_attitude(py::array_t<double> q, py::array_t<double> w, double delta_t) {
     py::buffer_info q_ = q.request(), w_ = w.request();
@@ -24,10 +24,10 @@ py::array_t<double> propagate_attitude(py::array_t<double> q, py::array_t<double
     double *q_ptr = static_cast<double*>(q_.ptr);
     double *w_ptr = static_cast<double*>(w_.ptr);
 
-    Quaternion Q {q_ptr[0], q_ptr[1], q_ptr[2], q_ptr[3]};
-    Vector W {w_ptr[0], w_ptr[1], w_ptr[2]};
+    Quaterniond Q {q_ptr[0], q_ptr[1], q_ptr[2], q_ptr[3]};
+    Vector3d W {w_ptr[0], w_ptr[1], w_ptr[2]};
 
-    ahrs::propagate_attitude(Q, W, delta_t);
+    AttitudeEstimation::propagate_attitude<double>(Q, W, delta_t);
 
     auto q_new = py::array_t<double>(4);
     py::buffer_info q_new_ = q_new.request();

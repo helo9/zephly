@@ -9,10 +9,10 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "attitude_propagation.hpp"
+#include "attitude_estimation.hpp"
 
 using namespace Catch;
-using namespace ahrs;
+using namespace AttitudeEstimation;
 
 using mathtypes = std::tuple<float, double>;
 
@@ -25,11 +25,11 @@ TEMPLATE_LIST_TEST_CASE( "Attitude is propaged", "[ahrs]", mathtypes )
 
     TestType norm = sqrt(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z);
 
-    REQUIRE( q.w == Approx(0.99997500) );
-    REQUIRE( q.x == Approx(0.00499988) );
-    REQUIRE( q.y == Approx(0.0) );
-    REQUIRE( q.z == Approx(0.0) );
-    REQUIRE( norm == Approx(1.0).margin(1e-4) );
+    REQUIRE( q.w == Approx(0.99997500).epsilon(0.001) );
+    REQUIRE( q.x == Approx(0.00499988).epsilon(0.001) );
+    REQUIRE( q.y == Approx(0.0).epsilon(0.001) );
+    REQUIRE( q.z == Approx(0.0).epsilon(0.001) );
+    REQUIRE( norm == Approx(1.0).epsilon(0.001) );
 }
 
 TEMPLATE_LIST_TEST_CASE( "Propagate multiple times", "[ahrs]", mathtypes )
@@ -37,7 +37,7 @@ TEMPLATE_LIST_TEST_CASE( "Propagate multiple times", "[ahrs]", mathtypes )
     Quaternion<TestType> q{1.0, 0.0, 0.0};
     Vector<TestType, 3> omega{0.1, 0.0, 0.0};
 
-    auto data = xt::load_npy<double>("test.npy");
+    auto data = xt::load_npy<double>("examples/example_data.npy");
 
     auto row_num = xt::adapt(data.shape())(0);
 
@@ -49,8 +49,6 @@ TEMPLATE_LIST_TEST_CASE( "Propagate multiple times", "[ahrs]", mathtypes )
         propagate_attitude<TestType>(q, omega, static_cast<TestType>(0.001));
 
         double norm = q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z;
-
-        //printf("%f - %f - %f - %f -- %f\n", q.w, q.x, q.y, q.z, norm);
 
         REQUIRE( norm == Approx(1.0) );
     }

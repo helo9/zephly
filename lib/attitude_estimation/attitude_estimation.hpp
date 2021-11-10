@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-namespace ahrs {
+namespace AttitudeEstimation {
 
 template <typename T>
 static T sqrt(T value)

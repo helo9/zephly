@@ -17,7 +17,7 @@ else ()
     
 endif()
 
-target_link_libraries(app PRIVATE ahrs)
+target_link_libraries(app PRIVATE attitude_estimation)
 
 # disable exceptions
 # to mitigate problems with static variable initialization guards

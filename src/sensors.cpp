@@ -1,6 +1,8 @@
 #include "sensors.hpp"
 #include <drivers/sensor.h>
 
+using namespace AttitudeEstimation;
+
 constexpr double SAMPLING_FREQUENCY = 400.0;
 constexpr double DEG2RAD = 0.017453292519943295;
 
@@ -85,15 +87,15 @@ bool update_measurements() {
   return true;
 }
 
-const ahrs::Vector<double, 3>& get_rotation_speed() {
+const Vector<double, 3>& get_rotation_speed() {
     return measurements.rotation_speed;
 }
 
-const ahrs::Vector<double, 3>& get_mag_field() {
+const Vector<double, 3>& get_mag_field() {
     return measurements.mag_field;
 }
 
-const ahrs::Vector<double, 3>& get_accelerations() {
+const Vector<double, 3>& get_accelerations() {
   return measurements.accelerations;
 }
 

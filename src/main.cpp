@@ -5,13 +5,13 @@
 #include <zephyr.h>
 #include <math.h>
 
-#include <attitude_propagation.hpp>
+#include <attitude_estimation.hpp>
 #include "settings.hpp"
 #include "pwm.hpp"
 
 constexpr double DEG2RAD = 0.017453292519943295;
 
-using namespace ahrs;
+using namespace AttitudeEstimation;
 
 const float outputs[] = {0.5f, 0.5f, 0.5f, 0.5f};
 
@@ -54,5 +54,5 @@ int main() {
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w, const Vector<double, 3> &a) {
   printf("%f %f %f %f", q.w, q.x, q.y, q.z);
   printf(" %u %f %f %f", k_uptime_get_32(), w.data[0], w.data[1], w.data[2]);
-  printf("%f %f %f \n", a.data[0], a.data[1], a.data[2]);
+  printf(" %f %f %f \n", a.data[0], a.data[1], a.data[2]);
 }
