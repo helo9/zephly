@@ -6,17 +6,20 @@
 #include <drivers/pwm.h>
 #include <drivers/gpio.h>
 
-#define PWM_DEVICE DT_NODELABEL(pwm1)
-#define PWM_CHANNEL DT_PWMS_CHANNEL_BY_IDX(PWM_DEVICE, 0)
+#define PWM_DEVICE1 DT_NODELABEL(pwm1)
+#define PWM_DEVICE2 DT_NODELABEL(pwm2)
 
 #define LED_NODE DT_ALIAS(userled0)
 #define LED_GPIO DT_PHANDLE(LED_NODE, gpios)
-#define PIN	DT_GPIO_PIN(LED_NODE, gpios)
+#define LED_PIN	DT_GPIO_PIN(LED_NODE, gpios)
 
 const struct device* led = DEVICE_DT_GET(LED_GPIO);
 
+const struct device* pwm_dev1 = DEVICE_DT_GET(PWM_DEVICE1);
+const struct device* pwm_dev2 = DEVICE_DT_GET(PWM_DEVICE2);
+
 void main() {
-    //const struct device* pwm_dev = DEVICE_DT_GET(PWM_DEVICE);
+    
 
     bool led_is_on = true;
 
@@ -25,27 +28,33 @@ void main() {
         return;
     }
 
-    int ret = gpio_pin_configure(led, 3, GPIO_OUTPUT_ACTIVE | GPIO_ACTIVE_HIGH);
+    int ret = gpio_pin_configure(led, LED_PIN, GPIO_OUTPUT_ACTIVE | GPIO_ACTIVE_HIGH);
     if (ret < 0) {
         return;
     }
 
-    /*if (!device_is_ready(pwm_dev)) {
+    if (!device_is_ready(pwm_dev1) || !device_is_ready(pwm_dev2)) {
         printk("PWM is not ready!");
         return;
-    }*/
+    }
 
     while (true) {
-        printk("Hallo %d %d \t", ret, PIN);
-        ret = gpio_pin_set(led, PIN, (int)led_is_on );
+        printk("Hallo %d %d \t", ret, LED_PIN);
+        ret = gpio_pin_set(led, LED_PIN, (int)led_is_on );
         led_is_on = !led_is_on;
-        /*int err = 0;
-        err |= pwm_pin_set_usec(pwm_dev, 1, 20000, 2000, 0);
-        err |= pwm_pin_set_usec(pwm_dev, 2, 20000, 2000, 0);
-        err |= pwm_pin_set_usec(pwm_dev, 3, 20000, 2000, 0);
-        err |= pwm_pin_set_usec(pwm_dev, 4, 20000, 2000, 0);
-
-        printk("%d\n", err);*/
+        
+        if (led_is_on) {
+            ret = pwm_pin_set_usec(pwm_dev1, 4, 20000, 2000, 0);
+            pwm_pin_set_usec(pwm_dev1, 3, 20000, 2000, 0);
+            pwm_pin_set_usec(pwm_dev1, 2, 20000, 2000, 0);
+            pwm_pin_set_usec(pwm_dev2, 1, 20000, 2000, 0);
+        } else {
+            ret = pwm_pin_set_usec(pwm_dev1, 4, 20000, 1000, 0);
+            pwm_pin_set_usec(pwm_dev1, 3, 20000, 1000, 0);
+            pwm_pin_set_usec(pwm_dev1, 2, 20000, 1000, 0);
+            pwm_pin_set_usec(pwm_dev2, 1, 20000, 1000, 0);
+        }
+        printk("%d\n", ret);
 
         k_sleep(K_MSEC(1500));
     }
