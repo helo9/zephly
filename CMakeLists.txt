@@ -12,11 +12,10 @@ else ()
     find_package(Zephyr)
     project(attitude_estimation)
 
-
     add_subdirectory(lib)
 
     if(BUILD_EXPERIMENT)
-        target_sources(app PRIVATE src/main_experiment.cpp)
+        target_sources(app PRIVATE src/main_experiment_spi.c)
     else ()
         target_sources(app PRIVATE 
             src/main.cpp

@@ -69,7 +69,17 @@
 &spi1 {
 	pinctrl-0 = <&spi1_nss_master_pa4 &spi1_sck_master_pa5
 		     &spi1_miso_master_pa6 &spi1_mosi_master_pa7>;
+	cs-gpios = <&gpioa 04 GPIO_ACTIVE_LOW>;
+	clock-frequency = <562500>;
 	status = "okay";
+
+	mpu6000@0 {
+		compatible = "invensense,mpu6050";
+		reg = <0>;
+		max-frequency = <DT_FREQ_M(1)>;
+		label = "MPU-6000";
+		status = "okay";
+	};
 };
 
 &spi2 {
