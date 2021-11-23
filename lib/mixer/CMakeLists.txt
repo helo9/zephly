@@ -5,11 +5,12 @@ project(mixerlib)
 option(BUILD_TESTS "Build test programs" OFF)
 
 add_library(mixer STATIC mixer.cpp)
+target_link_libraries(mixer PRIVATE msgs)
 target_include_directories(mixer INTERFACE .)
 
-if(BUILD_TESTS)
+if(BUILD_TESTING)
     find_package(Catch2 3 REQUIRED)
 
     add_executable(test test_mixer.cpp)
-    target_link_libraries(test PRIVATE Catch2::Catch2WithMain mixer)
+    target_link_libraries(test PRIVATE Catch2::Catch2WithMain mixer msgs)
 endif()

@@ -6,7 +6,6 @@
 #include <math.h>
 
 #include <attitude_estimation.hpp>
-#include "settings.hpp"
 #include "pwm.hpp"
 
 constexpr double DEG2RAD = 0.017453292519943295;
@@ -18,7 +17,6 @@ const float outputs[] = {0.5f, 0.5f, 0.5f, 0.5f};
 void report_state(const Quaternion<double> &q, const Vector<double, 3> &w, const Vector<double, 3> &a);
 
 int main() {
-
 
   if (!initialize_sensors() || !pwm().is_ready()) {
     printk("Initialization failed!");
@@ -40,10 +38,6 @@ int main() {
     propagate_attitude<double>(q, get_rotation_speed(), get_delta_t());
 
     report_state(q, get_rotation_speed(), get_accelerations());
-
-    /*auto tmp = get_mag_field();
-
-    //printf("%f\t%f\t%f\n", tmp.data[0], tmp.data[1], tmp.data[2]);*/
 
     k_sleep(K_MSEC(50));
   }
