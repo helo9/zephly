@@ -7,7 +7,7 @@ manifest:
   projects:
     - name: zephyr
       remote: custom-zephyr
-      revision: i3g4250_extended_support
+      revision: st-half-duplex-uart
       import: true
   self:
     path: frickelflightcontrol

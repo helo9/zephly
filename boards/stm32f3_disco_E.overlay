@@ -1,3 +1,7 @@
 &pwm1 {
     pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pa9 &tim1_ch3_pa10 &tim1_ch4_pe14>;
 };
+
+&usart2 {
+    half-duplex;
+};
