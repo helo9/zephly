@@ -7,7 +7,7 @@ manifest:
   projects:
     - name: zephyr
       remote: custom-zephyr
-      revision: st-half-duplex-uart
+      revision: custom_features
       import: true
   self:
     path: frickelflightcontrol
