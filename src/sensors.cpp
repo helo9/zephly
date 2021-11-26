@@ -3,16 +3,24 @@
 
 using namespace AttitudeEstimation;
 
+#define GYRO_DEV DT_NODELABEL(gyro0)
+#define MAG_DEV DT_NODELABEL(mag0)
+#define ACC_DEV DT_NODELABEL(acc0)
+
+#define NODE_OKAY(node_id) (DT_NODE_EXISTS(node_id) && DT_NODE_HAS_STATUS(node_id, okay))
+
 constexpr double SAMPLING_FREQUENCY = 400.0;
 constexpr double DEG2RAD = 0.017453292519943295;
+
+static Measurements measurements {};
+
+#if NODE_OKAY(GYRO_DEV) && NODE_OKAY(MAG_DEV) && NODE_OKAY(ACC_DEV)
 
 static Sensors sensors {
     DEVICE_DT_GET_ONE(st_i3g4250d),
     DEVICE_DT_GET_ONE(st_lsm303agr_magn),
     DEVICE_DT_GET_ONE(st_lsm303agr_accel)
 };
-
-static Measurements measurements {};
 
 bool initialize_sensors() {
   /* ensure device is ready */
@@ -86,6 +94,17 @@ bool update_measurements() {
 
   return true;
 }
+#else
+
+bool initialize_sensors() {
+  return true;
+}
+
+bool update_measurements() {
+  return true;
+}
+
+#endif
 
 const Vector<double, 3>& get_rotation_speed() {
     return measurements.rotation_speed;
@@ -102,3 +121,5 @@ const Vector<double, 3>& get_accelerations() {
 const double& get_delta_t() {
     return measurements.delta_t;
 }
+
+
