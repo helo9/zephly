@@ -1,6 +1,5 @@
 #include <device.h>
 
-#define PWM_DEVICE DT_NODELABEL(pwm1)
 
 class PWM {
 
@@ -12,8 +11,8 @@ public:
     PWM(PWM const&)		        = delete;
 	void operator=(PWM const&)  = delete;
 
-    static PWM& getInstance() {
-        static PWM pwm(DEVICE_DT_GET(PWM_DEVICE));
+    static PWM& init() {
+        static PWM pwm;
 
         return pwm;
     }
@@ -22,10 +21,12 @@ public:
     
     void write(const float (&outputs)[4]);
 
+    void print();
+
 private:
-    PWM(const struct device* pwm_dev);
+    PWM();
 
-    const struct device* _pwm_dev;
+    const struct device* _pwm_devs[4];
+    uint8_t _pwm_num_of_pins[4];
+
 };
-
-constexpr auto pwm = PWM::getInstance;
