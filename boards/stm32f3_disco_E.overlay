@@ -1,3 +1,9 @@
+/ {
+    aliases {
+        rc-uart = &usart2;
+    };
+};
+
 &pwm1 {
     //pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pa9 &tim1_ch3_pa10 &tim1_ch4_pe14>;
     pinctrl-0 = <&tim1_ch1n_pe8 &tim1_ch2n_pe10 &tim1_ch3n_pe12 &tim1_ch4_pe14>;

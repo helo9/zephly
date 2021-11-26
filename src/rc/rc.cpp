@@ -2,7 +2,6 @@
 #include <device.h>
 #include <irq.h>
 #include <drivers/uart.h>
-#include <drivers/gpio.h>
 #include <string.h>
 #include "rc.hpp"
 #include "spm_srxl.h"
@@ -17,11 +16,9 @@
 
 #define SPEKTRUM_SRXL_MIN_LENGTH 5
 
-#define USART2_DEVICE DT_NODELABEL(usart2)
-#define GPIO_DEVICE DT_NODELABEL(gpiod)
+#define RC_UART_DEVICE DT_ALIAS(rc_uart)
 
-const struct device* usart2 = DEVICE_DT_GET(USART2_DEVICE);
-const struct device* gpio = DEVICE_DT_GET(GPIO_DEVICE);
+const struct device* usart_rc = DEVICE_DT_GET(RC_UART_DEVICE);
 
 struct rc_buffer_t {
     uint8_t buffer[SRXL_MAX_BUFFER_SIZE];
@@ -95,7 +92,6 @@ inline void handle_tx(const struct device *dev) {
     if(tx_id >= tx_buffer.cursor-1) {
         tx_buffer.ready = true;
         uart_irq_tx_disable(dev);
-        gpio_pin_set(gpio, 11, 0);
         tx_count++;
     }
 
@@ -126,12 +122,9 @@ static void rc_uart_cb_handler(const struct device *dev, void *_) {
 
 int rc_init() {
 
-    if (!device_is_ready(usart2) || !device_is_ready(gpio)) {
+    if (!device_is_ready(usart_rc)) {
         return -EIO;
     }
-
-    gpio_pin_configure(gpio, 11, GPIO_OUTPUT);
-	gpio_pin_set(gpio, 11, 0);
 
     // Init the local SRXL device
     if(!srxlInitDevice(SRXL_DEVICE_ID, SRXL_DEVICE_PRIORITY, SRXL_DEVICE_INFO, 0xaba)) {
@@ -144,10 +137,10 @@ int rc_init() {
     }
 
     // Set and enable ISR for uart2 rx
-    uart_irq_rx_disable(usart2);
-	uart_irq_tx_disable(usart2);
-    uart_irq_callback_user_data_set(usart2, rc_uart_cb_handler, NULL);
-    uart_irq_rx_enable(usart2);
+    uart_irq_rx_disable(usart_rc);
+	uart_irq_tx_disable(usart_rc);
+    uart_irq_callback_user_data_set(usart_rc, rc_uart_cb_handler, NULL);
+    uart_irq_rx_enable(usart_rc);
 
     get_active_buffer().cursor = 0;
 
@@ -166,7 +159,7 @@ int rc_update(uint32_t dt) {
     auto read_buffer = get_inactive_buffer();
 
     // Disable rx interrupt while parsing buffer
-    uart_irq_rx_disable(usart2);
+    uart_irq_rx_disable(usart_rc);
 
     if (read_buffer.ready) {
         
@@ -178,14 +171,14 @@ int rc_update(uint32_t dt) {
     }
 
     // Reenable rx interrupts again
-    uart_irq_rx_enable(usart2);
+    uart_irq_rx_enable(usart_rc);
 
     return ret;
 }
 
 struct RCInput rc_get() {
     
-    uart_irq_rx_disable(usart2);
+    uart_irq_rx_disable(usart_rc);
 
     struct RCInput input = {
         srxlChData.values[1],
@@ -194,7 +187,7 @@ struct RCInput rc_get() {
         srxlChData.values[3],
     };
 
-    uart_irq_rx_enable(usart2);
+    uart_irq_rx_enable(usart_rc);
 
     return input;
 }
@@ -216,8 +209,7 @@ void transmit_uart(uint8_t * pBuffer, uint8_t length) {
     tx_buffer.cursor = length;
     tx_buffer.ready = false;
 
-    gpio_pin_set(gpio, 11, 1);
-    uart_irq_tx_enable(usart2);
+    uart_irq_tx_enable(usart_rc);
 }
 
 }
