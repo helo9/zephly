@@ -36,7 +36,9 @@ int main() {
 	Quaternion<double> q = {1.0, 0.0, 0.0, 0.0};
 
 	rc_run();
-
+	
+	pwm().hack_it();
+	
 	while (true) {
 
 		rc_input = rc_get();

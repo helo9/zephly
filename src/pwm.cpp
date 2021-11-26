@@ -17,6 +17,10 @@ void PWM::write(const float (&outputs)[4]) {
         uint32_t pulse = _min_duty + static_cast<uint32_t>( (_max_duty - _min_duty) * outputs[i]);
         pwm_pin_set_usec(_pwm_dev, i+1, _period, pulse, 0);
     }
+
+#ifdef CONFIG_BOARD_STM32F3_DISCO
+    // Put correct configuration into stm32f303 register..
+    volatile int * volatile reg = (volatile int*)0x40012C20;
+    *reg = 0x1444;
+#endif
 }
-
-
