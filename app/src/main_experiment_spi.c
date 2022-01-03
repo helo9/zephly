@@ -1,5 +1,4 @@
 #include <zephyr.h>
-#include <zephyr.h>
 #include "irq.h"
 #include "kernel.h"
 #include "sys/util.h"
@@ -20,11 +19,13 @@
 #define SPI1_CS_PIN 4
 
 const struct device *led = DEVICE_DT_GET(LED_GPIO);
-const struct device *spi1 = DEVICE_DT_GET(DT_BUS(MPU6000));
+//const struct device *spi1 = DEVICE_DT_GET(DT_BUS(MPU6000));
 
-struct spi_config spi_cfg = SPI_CONFIG_DT(MPU6000, SPI_OP_MODE_MASTER | SPI_WORD_SET(8), 0);
+//struct spi_config spi_cfg = SPI_CONFIG_DT(MPU6000, SPI_OP_MODE_MASTER | SPI_WORD_SET(8), 0);
 
-int request_wai(const struct device* spi1);
+//int request_wai(const struct device* spi1);
+
+const struct device *imu = DEVICE_DT_GET(MPU6000);
 
 void main() {
 
@@ -40,8 +41,8 @@ void main() {
         return;
     }
 
-    if (!device_is_ready(spi1)) {
-        printk("SPI is not ready!");
+    if (!device_is_ready(imu)) {
+        printk("MPU6000 is not ready!");
         return;
     }
 
@@ -51,7 +52,7 @@ void main() {
         ret = gpio_pin_set(led, PIN, (int)led_is_on );
         led_is_on = !led_is_on;
 
-        ret = request_wai(spi1);
+        //ret = request_wai(spi1);
 
         if (ret != 0) {
             printk("Probleme probleme probleme.. (%d)\n", ret);
@@ -62,7 +63,7 @@ void main() {
     }
 }
 
-int request_wai(const struct device* spi1) {
+/*int request_wai(const struct device* spi1) {
 
     uint8_t buffer_tx[] = {0xF5, 0x00};
     uint8_t buffer_rx[2] = {};
@@ -91,4 +92,4 @@ int request_wai(const struct device* spi1) {
 
     return ret;
 }
-
+*/

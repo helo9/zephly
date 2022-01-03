@@ -3,8 +3,6 @@
 
 description: MPU-6000 motion tracking device
 
-# MPU-6000 is SPI or I2C.  MPU-6050 is I2C-only.  Driver does not
-# support SPI so stick with I2C variant.
 compatible: "invensense,mpu6000"
 
 include: spi-device.yaml

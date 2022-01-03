@@ -1,0 +1,4 @@
+config MPU6000_DRIVER
+	bool "MPU6000 SPI driver"
+	help
+	  Enable MPU6000 SPI drivers.

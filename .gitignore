@@ -3,3 +3,6 @@
 .cache/*
 */.cache
 *.pyenv
+*literature*
+*.log
+.vscode/*
