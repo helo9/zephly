@@ -19,23 +19,10 @@
 #define MPU6000 DT_NODELABEL(imu)
 #define SPI1_CS_PIN 4
 
-const struct device* led = DEVICE_DT_GET(LED_GPIO);
-const struct device* spi1 = DEVICE_DT_GET(SPI1);
-//const struct device* gpio_a = DEVICE_DT_GET(SPI1_CS);
+const struct device *led = DEVICE_DT_GET(LED_GPIO);
+const struct device *spi1 = DEVICE_DT_GET(DT_BUS(MPU6000));
 
-struct spi_cs_control spi_cs = {
-    .gpio_dev = DEVICE_DT_GET(SPI1_CS),
-	.gpio_pin = SPI1_CS_PIN,
-	.gpio_dt_flags = GPIO_ACTIVE_LOW,
-	.delay = 1,
-};
-
-const struct spi_config spi_cfg = {
-    .frequency = 1000000,
-    .operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8),
-    .slave = 1,
-    .cs = &spi_cs,
-};
+struct spi_config spi_cfg = SPI_CONFIG_DT(MPU6000, SPI_OP_MODE_MASTER | SPI_WORD_SET(8), 0);
 
 int request_wai(const struct device* spi1);
 
@@ -65,8 +52,6 @@ void main() {
         led_is_on = !led_is_on;
 
         ret = request_wai(spi1);
-
-        //ret = gpio_pin_set(spi_cs.gpio_dev, spi_cs.gpio_pin, (int)led_is_on);
 
         if (ret != 0) {
             printk("Probleme probleme probleme.. (%d)\n", ret);
