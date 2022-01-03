@@ -73,7 +73,7 @@
 	clock-frequency = <562500>;
 	status = "okay";
 
-	mpu6000@0 {
+	imu: mpu6000@0 {
 		compatible = "invensense,mpu6050";
 		reg = <0>;
 		max-frequency = <DT_FREQ_M(1)>;
