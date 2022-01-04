@@ -127,7 +127,8 @@ static int mpu6000_init(const struct device *dev) {
     }
 
     /* wake up device */
-    ret = mpu6000_spi_write(dev, MPU6000_REG_PWR_MGMT1, MPU6000_SLEEP_EN, 1);
+    uint8_t data = MPU6000_SLEEP_EN;
+    ret = mpu6000_spi_write(dev, MPU6000_REG_PWR_MGMT1, &data, 1);
     if ( ret != 0 ) {
         return ret;
     }
