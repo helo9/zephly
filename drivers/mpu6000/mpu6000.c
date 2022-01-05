@@ -86,21 +86,21 @@ int mpu6000_spi_write_reg(const struct device *dev, uint8_t reg,
     return mpu6000_spi_write(dev, reg, &value, 1);
 }
 
-static void mpu6000_convert_accel(struct sensor_value *val, uint16_t raw_value, uint16_t sensitivity_shift) {
+static void mpu6000_convert_accel(struct sensor_value *val, int16_t raw_value, uint16_t sensitivity_shift) {
     int64_t conv_val = ((int64_t)raw_value * SENSOR_G) >> sensitivity_shift;
     
     val->val1 = conv_val / 1000000LL;
     val->val2 = conv_val % 1000000LL;
 }
 
-static void mpu6000_convert_gyro(struct sensor_value *val, uint16_t raw_value, uint16_t sensitivity_x10) {
-    int64_t conv_val = ((int64_t)raw_value * SENSOR_PI * 10) / ((int64_t)sensitivity_x10 * 180);
+static void mpu6000_convert_gyro(struct sensor_value *val, int16_t raw_value, uint16_t sensitivity_x10) {
+    int64_t conv_val = ((int64_t)raw_value * SENSOR_PI * 10) / (sensitivity_x10 * 180);
 
     val->val1 = conv_val / 1000000LL;
     val->val2 = conv_val % 1000000LL;
 }
 
-static void mpu6000_convert_temp(struct sensor_value *val, uint16_t raw_value) {
+static void mpu6000_convert_temp(struct sensor_value *val, int16_t raw_value) {
     int64_t conv_val = ((int64_t)raw_value * 1000000LL) / 340 + 36530000LL;
 
     val->val1 = conv_val / 1000000LL;
