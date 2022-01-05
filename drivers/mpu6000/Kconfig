@@ -1,0 +1,30 @@
+menuconfig MPU6000_DRIVER
+	bool "MPU6000 SPI driver"
+	help
+	  Enable MPU6000 SPI drivers.
+
+if MPU6000_DRIVER
+
+config MPU6000_AFS_SEL
+	int "Accelerometer Full Scale Selection"
+	range 0 3
+	default 1
+	help
+	  This option allows to select the accelerometer range of this sensor.
+	  0 -  2g
+	  1 -  4g
+	  2 -  8g
+	  3 - 16g
+
+config MPU6000_FS_SEL
+	int "Gyrometer Full Scale Selection"
+	range 0 3
+	default 1
+	help
+	  This option allows to select the gyrometer range of this sensor.
+	  0 -  250 deg/s
+	  1 -  500 deg/s
+	  2 - 1000 deg/s
+	  3 - 2000 deg/s 
+
+endif # MPU6000_DRIVER

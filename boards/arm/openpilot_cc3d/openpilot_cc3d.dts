@@ -65,11 +65,20 @@
 	status = "okay";
 };
 
-
 &spi1 {
 	pinctrl-0 = <&spi1_nss_master_pa4 &spi1_sck_master_pa5
-		     &spi1_miso_master_pa6 &spi1_mosi_master_pa7>;
+					&spi1_miso_master_pa6 &spi1_mosi_master_pa7>;
+	cs-gpios = <&gpioa 04 GPIO_ACTIVE_LOW>;
+	clock-frequency = < DT_FREQ_M(1) >;
 	status = "okay";
+
+	imu: mpu6000@0 {
+		compatible = "invensense,mpu6000";
+		reg = <0>;
+		spi-max-frequency = < DT_FREQ_M(1) >;
+		label = "MPU-6000";
+		status = "okay";
+	};
 };
 
 &spi2 {
@@ -79,7 +88,6 @@
 };
 
 &timers1 {
-
 	pwm2: pwm {
 		status = "okay";
 		pinctrl-0 = <&tim1_ch1_pwm_pa8>;
@@ -87,7 +95,6 @@
 };
 
 &timers2 {
-
 	pwm4: pwm {
 		status = "okay";
 		pinctrl-0 = <&tim2_ch3_pwm_pa2>;
@@ -95,7 +102,6 @@
 };
 
 &timers3 {
-
 	pwm3: pwm {
 		status = "okay";
 		pinctrl-0 = <&tim3_ch1_pwm_pb4>;
