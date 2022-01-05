@@ -67,8 +67,8 @@ static int cmd_deactivate(const struct shell *sh, size_t argc, char **argv)
 
 SHELL_CMD_ARG_REGISTER(get_reg, NULL, "Read MPU6000 register", cmd_get_reg, 2, 0);
 SHELL_CMD_ARG_REGISTER(set_reg, NULL, "Set MPU6000 register", cmd_set_reg, 3, 0);
-SHELL_CMD_REGISTER(activate, NULL, "Set MPU6000 register", cmd_activate);
-SHELL_CMD_REGISTER(deactivate, NULL, "Set MPU6000 register", cmd_deactivate);
+SHELL_CMD_REGISTER(activate, NULL, "Print MPU6000 data", cmd_activate);
+SHELL_CMD_REGISTER(deactivate, NULL, "Stop printing MPU6000 data", cmd_deactivate);
 
 void main() {
 
