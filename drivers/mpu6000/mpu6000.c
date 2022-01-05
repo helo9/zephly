@@ -12,6 +12,8 @@
 
 #define DT_DRV_COMPAT invensense_mpu6000
 
+static uint16_t gyro_sensitivity_x10[4] = {1310, 655, 328, 164};
+
 int mpu6000_spi_read(const struct device *dev, uint8_t reg,
 				 uint8_t *data, uint16_t len)
 {
@@ -123,16 +125,16 @@ static int mpu6000_init(const struct device *dev) {
     }
 
     /* Set gyro range */
-    data->gyro_sensitivity_x10 = 655;
-    ret = mpu6000_spi_write_reg(dev, MPU6050_REG_GYRO_CFG, BIT(1));
+    data->gyro_sensitivity_x10 = gyro_sensitivity_x10[CONFIG_MPU6000_FS_SEL];
+    ret = mpu6000_spi_write_reg(dev, MPU6050_REG_GYRO_CFG, CONFIG_MPU6000_FS_SEL << 3);
     if ( ret != 0 ) {
         printk("Failed setting GYRO CFG\n");
         return ret;
     }
 
     /* Set accel range */
-    data->accel_sensitivity_shift = 13;
-    ret = mpu6000_spi_write_reg(dev, MPU6050_REG_ACCEL_CFG, BIT(1));
+    data->accel_sensitivity_shift = 14 - CONFIG_MPU6000_AFS_SEL;
+    ret = mpu6000_spi_write_reg(dev, MPU6050_REG_ACCEL_CFG, CONFIG_MPU6000_AFS_SEL << 3);
     if ( ret != 0 ) {
         printk("Failed setting GYRO CFG\n");
         return ret;
