@@ -99,16 +99,23 @@ void main() {
         if (running) {
             ret = sensor_sample_fetch(imu);
 
-            struct sensor_value gyro_x;
-            ret = sensor_channel_get(imu,
-                    SENSOR_CHAN_GYRO_X,
-                    &gyro_x);
+            struct sensor_value gyro[3];
+            struct sensor_value accel[3];
+            struct sensor_value temp;
+
+            sensor_channel_get(imu, SENSOR_CHAN_GYRO_XYZ, gyro);
+            sensor_channel_get(imu, SENSOR_CHAN_ACCEL_XYZ, accel);
+            sensor_channel_get(imu, SENSOR_CHAN_DIE_TEMP, &temp);
 
             if (ret != 0) {
                 printk("error occured while collecting data (%d)\n", ret);
                 ret = 0;
             } else {
-                printf("gyro_x: %f\n", sensor_value_to_double(&gyro_x));
+                printf("%f\t%f\t%f\t-\t%f\t%f\t%f\t-\t%f\n", 
+                    sensor_value_to_double(&gyro[0]),sensor_value_to_double(&gyro[1]),
+                    sensor_value_to_double(&gyro[2]),sensor_value_to_double(&accel[0]),
+                    sensor_value_to_double(&accel[1]),sensor_value_to_double(&accel[2]),
+                    sensor_value_to_double(&temp));
             }
         }
         

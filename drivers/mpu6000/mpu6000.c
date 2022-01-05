@@ -3,11 +3,11 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-
 #include <init.h>
 #include <devicetree.h>
 #include <drivers/sensor.h>
 #include <sys/byteorder.h>
+#include <sys/types.h>
 #include "mpu6000.h"
 
 #define DT_DRV_COMPAT invensense_mpu6000
@@ -86,11 +86,25 @@ int mpu6000_spi_write_reg(const struct device *dev, uint8_t reg,
     return mpu6000_spi_write(dev, reg, &value, 1);
 }
 
-static void mpu6000_convert(struct sensor_value *val, uint16_t raw_value) {
-    int64_t conn_val = ((int64_t)raw_value * SENSOR_PI * 10) / (655 * 180U);
+static void mpu6000_convert_accel(struct sensor_value *val, uint16_t raw_value, uint16_t sensitivity_shift) {
+    int64_t conv_val = ((int64_t)raw_value * SENSOR_G) >> sensitivity_shift;
+    
+    val->val1 = conv_val / 1000000LL;
+    val->val2 = conv_val % 1000000LL;
+}
 
-    val->val1 = conn_val / 1000000;
-    val->val2 = conn_val % 1000000;
+static void mpu6000_convert_gyro(struct sensor_value *val, uint16_t raw_value, uint16_t sensitivity_x10) {
+    int64_t conv_val = ((int64_t)raw_value * SENSOR_PI * 10) / ((int64_t)sensitivity_x10 * 180);
+
+    val->val1 = conv_val / 1000000LL;
+    val->val2 = conv_val % 1000000LL;
+}
+
+static void mpu6000_convert_temp(struct sensor_value *val, uint16_t raw_value) {
+    int64_t conv_val = ((int64_t)raw_value * 1000000LL) / 340 + 36530000LL;
+
+    val->val1 = conv_val / 1000000LL;
+    val->val2 = conv_val % 1000000LL;
 }
 
 static int mpu6000_init(const struct device *dev) {
@@ -176,12 +190,44 @@ static int mpu6000_fetch(const struct device *dev,
 }
 
 static int mpu6000_get(const struct device *dev,
-            enum sensor_channel chan,
-            struct sensor_value *val) {
+            enum sensor_channel chan, struct sensor_value *val) {
     struct mpu6000_data *data = dev->data;
     
-    if (chan == SENSOR_CHAN_GYRO_X) {
-        mpu6000_convert(&val[0], data->accel_z);
+    switch (chan) {
+    case SENSOR_CHAN_ACCEL_XYZ:
+        mpu6000_convert_accel(&val[0], data->accel_x, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[1], data->accel_y, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[2], data->accel_z, data->accel_sensitivity_shift);
+        break;
+    case SENSOR_CHAN_ACCEL_X:
+        mpu6000_convert_accel(&val[0], data->accel_x, data->accel_sensitivity_shift);
+        break;
+    case SENSOR_CHAN_ACCEL_Y:
+        mpu6000_convert_accel(&val[0], data->accel_y, data->accel_sensitivity_shift);
+        break;
+    case SENSOR_CHAN_ACCEL_Z:
+        mpu6000_convert_accel(&val[0], data->accel_z, data->accel_sensitivity_shift);
+        break;
+    case SENSOR_CHAN_GYRO_XYZ:
+        mpu6000_convert_gyro(&val[0], data->gyro_x, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[1], data->gyro_y, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[2], data->gyro_z, data->gyro_sensitivity_x10);
+        break;
+    case SENSOR_CHAN_GYRO_X:
+        mpu6000_convert_gyro(&val[0], data->gyro_x, data->gyro_sensitivity_x10);
+        break;
+    case SENSOR_CHAN_GYRO_Y:
+        mpu6000_convert_gyro(&val[0], data->gyro_y, data->gyro_sensitivity_x10);
+        break;
+    case SENSOR_CHAN_GYRO_Z:
+        mpu6000_convert_gyro(&val[0], data->gyro_z, data->gyro_sensitivity_x10);
+        break;
+    case SENSOR_CHAN_DIE_TEMP:
+        mpu6000_convert_temp(&val[0], data->temp);
+        break;
+    default:
+        /* an invalid channel was selcted */
+        return -EINVAL;
     }
 
     return 0;
