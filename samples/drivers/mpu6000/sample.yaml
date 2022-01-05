@@ -1,0 +1,12 @@
+sample:
+  name: MPU-6000 example application
+  description:  |
+    This application allows to read and set individual
+    register of an connected MPU-6000 IMU via shell. It 
+    is available for the openpilot_cc3d board. Furthermore
+    a aquisition mode can be started, gathering and
+    displaying sensor data.
+tests:
+  ffc.drivers.mpu600:
+    build_only: true
+    platform_allow: openpilot_cc3d

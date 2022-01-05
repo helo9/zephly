@@ -2,7 +2,11 @@
 #include <devicetree.h>
 #include <drivers/sensor.h>
 #include <drivers/gpio.h>
-
+#include <drivers/spi.h>
+#include <shell/shell.h>
+#include <mpu6000.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define LED_NODE DT_ALIAS(userled0)
 #define LED_GPIO DT_PHANDLE(LED_NODE, gpios)
@@ -12,6 +16,59 @@
 
 const struct device *led = DEVICE_DT_GET(LED_GPIO);
 const struct device *imu = DEVICE_DT_GET(MPU6000);
+
+bool running = false;
+
+static int cmd_get_reg(const struct shell *sh, size_t argc, char **argv)
+{
+    uint8_t reg = (uint8_t)strtol(argv[1], NULL, 16);
+
+    uint8_t val;
+    int ret = mpu6000_spi_read_reg(imu, reg, &val);
+
+    if ( ret != 0 ) {
+        printk("Couldn't read register (%d)\n", ret);
+        return ret;
+    } 
+
+    printk("Reg 0x%x: 0x%x\n", reg, val);
+    
+    return 0;
+}
+
+static int cmd_set_reg(const struct shell *sh, size_t argc, char **argv)
+{
+    uint8_t reg = (uint8_t)strtol(argv[1], NULL, 16);
+    uint8_t val = (uint8_t)strtol(argv[2], NULL, 16);
+
+    int ret = mpu6000_spi_write_reg(imu, reg, val);
+
+    if ( ret != 0 ) {
+        printk("Error writing register 0x%x\n", reg);
+        return reg;
+    }
+
+    printk("Reg 0x%x was set to 0x%x\n", reg, val);
+	
+    return 0;
+}
+
+static int cmd_activate(const struct shell *sh, size_t argc, char **argv)
+{
+    running = true;
+    return 0;
+}
+
+static int cmd_deactivate(const struct shell *sh, size_t argc, char **argv)
+{
+    running = false;
+    return 0;
+}
+
+SHELL_CMD_ARG_REGISTER(get_reg, NULL, "Read MPU6000 register", cmd_get_reg, 2, 0);
+SHELL_CMD_ARG_REGISTER(set_reg, NULL, "Set MPU6000 register", cmd_set_reg, 3, 0);
+SHELL_CMD_REGISTER(activate, NULL, "Set MPU6000 register", cmd_activate);
+SHELL_CMD_REGISTER(deactivate, NULL, "Set MPU6000 register", cmd_deactivate);
 
 void main() {
 
@@ -32,20 +89,29 @@ void main() {
         return;
     }
 
-    while (true) {
-        printk("Noch da :)\n");
+    printk("Succesfully started :)\n");
 
+    while (true) {
+        
         ret = gpio_pin_set(led, PIN, (int)led_is_on );
         led_is_on = !led_is_on;
 
-        //ret = request_wai(spi1);
-        ret = sensor_sample_fetch(imu);
+        if (running) {
+            ret = sensor_sample_fetch(imu);
 
-        if (ret != 0) {
-            printk("Probleme probleme probleme.. (%d)\n", ret);
-            ret = 0;
+            struct sensor_value gyro_x;
+            ret = sensor_channel_get(imu,
+                    SENSOR_CHAN_GYRO_X,
+                    &gyro_x);
+
+            if (ret != 0) {
+                printk("error occured while collecting data (%d)\n", ret);
+                ret = 0;
+            } else {
+                printf("gyro_x: %f\n", sensor_value_to_double(&gyro_x));
+            }
         }
         
-        k_sleep(K_MSEC(1000));
+        k_sleep(K_MSEC(500));
     }
 }
