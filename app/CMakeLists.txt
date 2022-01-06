@@ -6,20 +6,14 @@ message(INFO "jojojo ${BOARD_ROOT}")
 
 project(attitude_estimation)
 
-if(BUILD_EXPERIMENT)
-    target_sources(app PRIVATE src/main_experiment_spi.c)
-else ()
-    target_sources(app PRIVATE 
-        src/main.cpp
-        src/sensors.cpp
-        src/pwm.cpp 
-        src/rc/rc.cpp
-        src/rc/rc_thread.cpp
-        src/rc/spm_srxl.c
-    )
-endif()
 
-#target_link_libraries(app PRIVATE attitude_estimation msgs)
+target_sources(app PRIVATE 
+    src/main.cpp
+    src/sensors.cpp
+    src/pwm.cpp 
+    src/rc/rc.cpp
+    src/rc/rc_thread.cpp
+    src/rc/spm_srxl.c
 
 # disable exceptions
 # to mitigate problems with static variable initialization guards
