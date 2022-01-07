@@ -1,0 +1,37 @@
+# Copyright (c) 2022, Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: zephyrprojectrtos/ci:v0.20.0
+    env:
+      #CMAKE_PREFIX_PATH: /opt/toolchains
+      ZEPHYR_SDK_INSTALL_DIR: /opt/toolchains/zephyr-sdk-0.13.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: frickelflightcontrol
+
+
+      - name: Initialize
+        working-directory: frickelflightcontrol
+        run: |
+          pip3 install -U west
+          west init -l .
+          west update
+          west zephyr-export
+          pip3 install -r ../zephyr/scripts/requirements-base.txt
+      - name: Random build
+        working-directory: frickelflightcontrol
+        run: |
+          west build --board=native_posix -s tests/lib/control
+      - name: Run Tests
+        working-directory: frickelflightcontrol
+        run: |
+          ../zephyr/scripts/twister -T tests -p native_posix -v
