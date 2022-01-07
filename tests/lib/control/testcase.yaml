@@ -1,0 +1,4 @@
+tests:
+  lib.control:
+    platform_allow: native_posix
+    tags: control
