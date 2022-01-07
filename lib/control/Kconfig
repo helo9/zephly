@@ -1,0 +1,4 @@
+config FFC_PID_CONTROL_LIB
+    bool "PID control library"
+    help
+      Enable the ffc pid control library.
