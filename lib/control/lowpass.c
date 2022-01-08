@@ -20,7 +20,7 @@ void lowpass_init(struct LowPass *lp, float f_s, float f_c) {
  * @return float filtered value
  */
 float lowpass_update(struct LowPass *lp, const float x) {
-    lp->last_y = (1-lp->alpha) * lp->last_y + lp->alpha * x;
+    lp->last_y = (1.0f-lp->alpha) * lp->last_y + lp->alpha * x;
 
     return lp->last_y;
 }
