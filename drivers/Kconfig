@@ -4,5 +4,6 @@
 menu "Drivers"
 
 rsource "mpu6000/Kconfig"
+rsource "rc/Kconfig"
 
 endmenu

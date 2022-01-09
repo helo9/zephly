@@ -1,13 +1,13 @@
 manifest:
   remotes:
-    - name: zephyrproject-rots
+    - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
     - name: custom-zephyr
       url-base: https://github.com/helo9
   projects:
     - name: zephyr
       remote: custom-zephyr
-      revision: custom_features
+      revision: st-half-duplex-uart
       import: true
   self:
     path: frickelflightcontrol

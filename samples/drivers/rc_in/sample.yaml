@@ -1,0 +1,9 @@
+sample:
+  name: Spektrum SRXL2 receiver example
+  description:  |
+    This application collects data from a connected Spektrum SRXL2
+    reciever and prints it to the serial console.
+tests:
+  ffc.drivers.rc_in_srxl2:
+    build_only: true
+    platform_allow: openpilot_cc3d
