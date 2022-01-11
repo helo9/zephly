@@ -13,18 +13,12 @@ void main() {
 
     printk("Hallo Welt\n");
 
-    unsigned int counter = 0;
-    int err = 0;
     while (true)  {
-        if (counter++ > 400) {
-            rc_update(rc, &rc_in);
-            printk("Noch da :) (%d)\n", err);
-            printk("%d %d %d %d\n", rc_in.roll, rc_in.pitch, rc_in.throttle, rc_in.yaw);
-            counter = 0;
-        }
 
-        err = rc_run_once(rc, 5);
+        rc_update(rc, &rc_in);
+        printk("Noch da :)\n");
+        printk("%d %d %d %d\n", rc_in.roll, rc_in.pitch, rc_in.throttle, rc_in.yaw);
 
-        k_sleep(K_MSEC(5));
+        k_sleep(K_MSEC(500));
     }
 }
