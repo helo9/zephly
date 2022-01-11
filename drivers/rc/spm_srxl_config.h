@@ -35,7 +35,7 @@ extern "C" {
 #endif
 
 // Forward Declaration
-void transmit_uart(void *uart, uint8_t * pBuffer, uint8_t length);
+void srxl2_transmit_uart(void *uart, uint8_t * pBuffer, uint8_t length);
 
 //### USER CONFIGURATION ###
 
@@ -104,7 +104,7 @@ static inline void srxlChangeBaudRate(void *uart, uint32_t baudRate)
 // length - the number of bytes contained in pBuffer that should be sent
 static inline void srxlSendOnUart(void *uart, uint8_t* pBuffer, uint8_t length)
 {
-    transmit_uart(uart, pBuffer, length);
+    srxl2_transmit_uart(uart, pBuffer, length);
 }
 
 // User-provided callback routine to fill in the telemetry data to send to the master when requested:

@@ -18,19 +18,19 @@ struct rc_input {
     uint16_t yaw;
 };
 
+struct rc_api {
+	void (*update)(const struct device *dev, struct rc_input *rc_in);
+};
+
 /**
- * @brief Call during initialization of system
- *
- * @details Initializes parser state machine and
- * variables. Also checks whether underlying uart
- * is available and enable interrupts.
+ * @brief update rc_in struct with values from receiver device
  * 
- * @return int 0 or -error
+ * @param dev receiver device
+ * @param rc_in pointer to rc input to be updated
  */
-//int rc_init(struct RCInput *rc);
-
-int rc_run_once(const struct device *dev, uint32_t dt);
-
-void rc_update(const struct device *dev, struct rc_input *rc_in);
+static inline void rc_update(const struct device *dev, struct rc_input *rc_in) {
+    const struct rc_api *api = dev->api;
+    api->update(dev, rc_in);
+}
 
 #endif // FFC_RC_H
