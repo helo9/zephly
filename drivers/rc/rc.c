@@ -256,12 +256,12 @@ static float srxl2_convert(uint16_t raw_value) {
     return raw_value / 32768.0f - 1.0f;
 }
 
-static void srxl2_update(const struct device *dev, struct rc_channels *rc_val) {
+static void srxl2_update(const struct device *dev, struct Command *rc_val) {
     struct srxl2_data *data = dev->data;
 
     rc_val->roll = srxl2_convert(data->last_val.roll);
     rc_val->pitch = srxl2_convert(data->last_val.pitch);
-    rc_val->throttle = srxl2_convert(data->last_val.throttle);
+    rc_val->thrust = srxl2_convert(data->last_val.throttle);
     rc_val->yaw = srxl2_convert(data->last_val.yaw);
 }
 

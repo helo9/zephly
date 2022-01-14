@@ -7,22 +7,13 @@
 #include <device.h>
 #include <drivers/uart.h>
 #include <stdint.h>
+#include <msgs/msgs.h>
 
 #ifndef FFC_RC_H
 #define FFC_RC_H
 
-/**
- * @brief rc channel data normalized to -1.0f to 1.0f
- */
-struct rc_channels {
-    float roll;
-    float pitch;
-    float throttle;
-    float yaw;
-};
-
 struct rc_api {
-	void (*update)(const struct device *dev, struct rc_channels *rc_in);
+	void (*update)(const struct device *dev, struct Command *rc_in);
 };
 
 /**
@@ -31,7 +22,7 @@ struct rc_api {
  * @param dev receiver device
  * @param rc_in pointer to rc input to be updated
  */
-static inline void rc_update(const struct device *dev, struct rc_channels *rc_in) {
+static inline void rc_update(const struct device *dev, struct Command *rc_in) {
     const struct rc_api *api = (struct rc_api*)dev->api;
     api->update(dev, rc_in);
 }
