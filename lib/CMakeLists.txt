@@ -1,4 +1,4 @@
 # add_subdirectory(msgs)
 # add_subdirectory(attitude_estimation)
-# add_subdirectory(mixer)
+add_subdirectory(mixer)
 add_subdirectory(control)
