@@ -2,6 +2,6 @@
 cmake_minimum_required(VERSION 3.20)
 
 find_package(Zephyr)
-project(control_tests)
+project(mixer_test)
 
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/main.cpp)
