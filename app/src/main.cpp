@@ -10,6 +10,7 @@
 #include <devicetree.h>
 #include <stdio.h>
 #include <custom_drivers/rc.h>
+#include <mixer/mixer.hpp>
 
 #include "pwm.hpp"
 
@@ -18,7 +19,7 @@
 const struct device *rc = DEVICE_DT_GET(RC_IN);
 
 float outputs[] = {0.5f, 0.5f, 0.5f, 0.5f};
-struct rc_channels rc_val;
+struct Command rc_val;
 
 int main() {
 	printk("Initialization started.\n");
@@ -36,6 +37,8 @@ int main() {
 	printk("Initialization complete.\n Running!\n");
 	while (true) {
 		rc_update(rc, &rc_val);
+
+		simple_mix(rc_val, outputs);
 		
 		pwm.write(outputs);
 
