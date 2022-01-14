@@ -29,6 +29,13 @@ struct srxl2_buffer {
     bool ready;
 };
 
+struct rc_input {
+    uint16_t roll;
+    uint16_t pitch;
+    uint16_t throttle;
+    uint16_t yaw;
+};
+
 struct srxl2_data {
     /* two receive buffers[active and passive] */
     struct srxl2_buffer rx_buffers[2];
@@ -156,7 +163,7 @@ static void srxl2_cb_handler(const struct device *uart, void *dev) {
 }
 
 
-int srxl2_run(const struct device *dev, uint32_t dt) {
+static int srxl2_run(const struct device *dev, uint32_t dt) {
     struct srxl2_data *data = dev->data;
     const struct srxl2_config *config = dev->config;
     int ret = 0;
@@ -245,13 +252,17 @@ static int srxl2_rc_init(const struct device *dev) {
     return 0;
 }
 
-void srxl2_update(const struct device *dev, struct rc_input *rc_in) {
+static float srxl2_convert(uint16_t raw_value) {
+    return raw_value / 32768.0f - 1.0f;
+}
+
+static void srxl2_update(const struct device *dev, struct rc_channels *rc_val) {
     struct srxl2_data *data = dev->data;
 
-    rc_in->roll = data->last_val.roll;
-    rc_in->pitch = data->last_val.pitch;
-    rc_in->throttle = data->last_val.throttle;
-    rc_in->yaw = data->last_val.yaw;
+    rc_val->roll = srxl2_convert(data->last_val.roll);
+    rc_val->pitch = srxl2_convert(data->last_val.pitch);
+    rc_val->throttle = srxl2_convert(data->last_val.throttle);
+    rc_val->yaw = srxl2_convert(data->last_val.yaw);
 }
 
 void srxl2_transmit_uart(void *dev_ptr, uint8_t * pBuffer, uint8_t length) {
