@@ -1,0 +1,4 @@
+tests:
+  lib.mixer:
+    platform_allow: native_posix
+    tags: mixer

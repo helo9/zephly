@@ -1,16 +1,5 @@
-cmake_minimum_required(VERSION 3.20)
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
 
-project(mixerlib)
-
-option(BUILD_TESTS "Build test programs" OFF)
-
-add_library(mixer STATIC mixer.cpp)
-target_link_libraries(mixer PRIVATE msgs)
-target_include_directories(mixer INTERFACE .)
-
-if(BUILD_TESTING)
-    find_package(Catch2 3 REQUIRED)
-
-    add_executable(test test_mixer.cpp)
-    target_link_libraries(test PRIVATE Catch2::Catch2WithMain mixer msgs)
-endif()
+zephyr_library()
+zephyr_library_sources_ifdef(CONFIG_FFC_MIXER_LIB mixer.cpp)

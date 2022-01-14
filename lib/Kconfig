@@ -4,5 +4,6 @@
 menu "Libraries"
 
 rsource "control/Kconfig"
+rsource "mixer/Kconfig"
 
 endmenu
