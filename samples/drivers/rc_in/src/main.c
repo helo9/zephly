@@ -7,17 +7,20 @@
 #define RC_IN DT_NODELABEL(rc)
 
 const struct device *rc = DEVICE_DT_GET(RC_IN);
-struct rc_input rc_in;
+struct rc_channels rc_in;
 
 void main() {
 
-    printk("Hallo Welt\n");
+	if (!device_is_ready(rc)) {
+		printk("RC IN device not ready.\n");
+		return;
+	}
 
     while (true)  {
-
         rc_update(rc, &rc_in);
-        printk("Noch da :)\n");
-        printk("%d %d %d %d\n", rc_in.roll, rc_in.pitch, rc_in.throttle, rc_in.yaw);
+        printk("Got roll: %d, pitch: %d, thrust: %d, yaw: %d\n", 
+            (int)(rc_in.roll*100), (int)(rc_in.pitch*100), 
+            (int)(rc_in.throttle*100), (int)(rc_in.yaw*100));
 
         k_sleep(K_MSEC(500));
     }
