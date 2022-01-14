@@ -29,7 +29,7 @@ struct rc_api {
  * @param rc_in pointer to rc input to be updated
  */
 static inline void rc_update(const struct device *dev, struct rc_input *rc_in) {
-    const struct rc_api *api = dev->api;
+    const struct rc_api *api = (struct rc_api*)dev->api;
     api->update(dev, rc_in);
 }
 

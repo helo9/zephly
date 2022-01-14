@@ -9,11 +9,8 @@ project(attitude_estimation)
 
 target_sources(app PRIVATE 
     src/main.cpp
-    src/sensors.cpp
     src/pwm.cpp 
-    src/rc/rc.cpp
-    src/rc/rc_thread.cpp
-    src/rc/spm_srxl.c
+)
 
 # disable exceptions
 # to mitigate problems with static variable initialization guards
