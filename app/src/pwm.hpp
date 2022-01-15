@@ -18,6 +18,8 @@ public:
     }
 
     bool is_ready() const;
+
+    uint32_t _get_pulse(float setpoint) const;
     
     void write(const float (&outputs)[4]);
 
