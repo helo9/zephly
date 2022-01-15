@@ -1,0 +1,7 @@
+# Controller rates
+RATE_A f32 5.2
+RATE_B f32 160.0
+
+# Some counts or something
+COUNT_X u32 0
+THRESHOLD_Y u32 0
