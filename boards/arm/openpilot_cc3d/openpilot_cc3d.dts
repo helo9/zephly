@@ -121,6 +121,7 @@
 };
 
 &timers4 {
+	st,prescaler = <72>;
 	status = "okay";
 	pwm1: pwm {
 		status = "okay";
