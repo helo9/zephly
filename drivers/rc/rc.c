@@ -262,7 +262,7 @@ static void srxl2_update(const struct device *dev, struct Command *rc_val) {
     rc_val->roll = srxl2_convert(data->last_val.roll);
     rc_val->pitch = srxl2_convert(data->last_val.pitch);
     rc_val->thrust = srxl2_convert(data->last_val.throttle);
-    rc_val->yaw = srxl2_convert(data->last_val.yaw);
+    rc_val->yaw = 2.0f * srxl2_convert(data->last_val.yaw) - 1.0f;
 }
 
 void srxl2_transmit_uart(void *dev_ptr, uint8_t * pBuffer, uint8_t length) {
