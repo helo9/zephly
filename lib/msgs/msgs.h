@@ -1,8 +1,8 @@
 #pragma once
 
 struct Command {
-    float roll;
-    float pitch;
-    float yaw;
-    float thrust;
+    float roll; // -1.0 to 1.0
+    float pitch; // -1.0 to 1.0
+    float yaw; // -1.0 to 1.0
+    float thrust; // 0.0 to 1.0
 };
