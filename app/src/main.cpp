@@ -18,7 +18,8 @@
 
 const struct device *rc = DEVICE_DT_GET(RC_IN);
 
-float outputs[] = {0.5f, 0.5f, 0.5f, 0.5f};
+/* initial pwm values */
+float outputs[] = {0.0f, 0.0f, 0.0f, 0.0f};
 struct Command rc_val;
 
 int main() {
@@ -34,11 +35,12 @@ int main() {
 	/* write initial pwm values */
 	pwm.write(outputs);
 
-	printk("Initialization complete.\n Running!\n");
+	printk("Initialization complete.\nRunning!\n");
+
 	while (true) {
 		rc_update(rc, &rc_val);
 
-		simple_mix(rc_val, outputs);
+		px_airmode_mix(rc_val, outputs);
 		
 		pwm.write(outputs);
 
