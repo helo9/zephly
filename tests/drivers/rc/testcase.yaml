@@ -1,0 +1,4 @@
+tests:
+  ffc.drivers.rc_common:
+    platform_allow: native_posix
+    tags: rc

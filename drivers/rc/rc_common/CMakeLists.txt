@@ -1,5 +1,5 @@
 # Copyright (c) 2022 Jonathan Hahn
 # SPDX-License-Identifier: Apache-2.0
 
-rsource "srxl2/Kconfig"
-rsource "rc_common/Kconfig"
+zephyr_library()
+zephyr_library_sources_ifdef(CONFIG_FFC_RC_COMMON rc.c)
