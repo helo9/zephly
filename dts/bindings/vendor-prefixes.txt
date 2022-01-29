@@ -1,0 +1,6 @@
+# Device tree binding vendor prefix registry. Keep this list in
+# alphabetical order.
+#
+# <vendor-prefix><TAB><Full name of vendor>
+
+spektrum	Horizon Hobby, Inc
