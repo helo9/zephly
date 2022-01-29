@@ -1,4 +1,4 @@
-config FFC_RC_DRIVER
-    bool "RC (SRXL2) driver"
-    help
-      Enable SRXL2 driver.
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+rsource "srxl2/Kconfig"
