@@ -1,4 +1,5 @@
 config FFC_SRXL2_RC_DRIVER
     bool "RC (SRXL2) driver"
+    depends on FFC_RC_COMMON
     help
       Enable SRXL2 driver.

@@ -27,4 +27,6 @@ static inline void rc_update(const struct device *dev, struct Command *rc_in) {
     api->update(dev, rc_in);
 }
 
+void rc_update_expo(const struct device *dev, struct Command *rc_in);
+
 #endif // FFC_RC_H
