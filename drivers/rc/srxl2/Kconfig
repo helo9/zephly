@@ -1,0 +1,4 @@
+config FFC_SRXL2_RC_DRIVER
+    bool "RC (SRXL2) driver"
+    help
+      Enable SRXL2 driver.
