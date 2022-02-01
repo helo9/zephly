@@ -1,0 +1,27 @@
+/ {
+        chosen {
+                zephyr,code-partition = &code_partition;
+        };
+};
+
+&flash0 {
+	status = "okay";
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		/* Reserve 80kB for the application */
+		code_partition: partition@0 {
+			label = "app";
+			reg = <0 0x12000>;
+			read-only;
+		};
+
+		/* Reserve 48kB for the settings*/
+		storage_partition: partition@12000 {
+			label = "storage";
+			reg = <0x12000 0xE000>;
+		};
+	};
+};
