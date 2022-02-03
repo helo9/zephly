@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "kernel.h"
 #include <math.h>
 #include <custom_drivers/rc.h>
 #include <settings/settings.h>
@@ -119,7 +120,58 @@ static int rc_cmd_show_settings(const struct shell *sh, size_t argc, char **argv
 SHELL_CMD_ARG_REGISTER(rc_set, NULL, "Read MPU6000 register", rc_cmd_settings_set, 3, 0);
 SHELL_CMD_REGISTER(rc_show, NULL, "Print MPU6000 data", rc_cmd_show_settings);
 
-#endif
+#endif /* SHELL enabled */
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+
+int rc_settings_handle_export(int (*cb)(const char *name,
+                    const void *value, size_t val_len)) 
+{
+    char buf[50];
+    printk("Export rc settings :)\n");
+    for (int i=0; i<RC_SETTINGS_COUNT; i++) {
+        snprintf(buf, sizeof(buf), "%s/%s", "rc", rc_setting_names[i]);
+        (void)cb(buf, &rc_settings[i], sizeof(rc_settings[i]));
+    }
+
+    return 0;
+}
+
+int rc_settings_handle_set(const char *name, size_t len, settings_read_cb read_cb,
+          void *cb_arg)
+{
+    
+    const char *next;
+
+    for (int i=0; i<RC_SETTINGS_COUNT; i++) {
+        const char *name_comp = rc_setting_names[i];
+        if(settings_name_steq(name, name_comp, &next) && !next) {
+            if (len != sizeof(rc_settings[i])) {
+                return -EINVAL;
+            }
+
+            printk("Found %s in none volatile storage :)\n", name_comp);
+
+            if (k_mutex_lock(&rc_settings_mutex, K_MSEC(100)) != 0) {
+                printk("Could not aquire rc_settings lock.\n");
+                return -ENOLCK;
+            }
+
+            read_cb(cb_arg, &rc_settings[i], sizeof(rc_settings[i]));
+
+            k_mutex_unlock(&rc_settings_mutex);
+        }
+    }
+    
+    return 0;
+}
+
+/* static subtree handler */
+SETTINGS_STATIC_HANDLER_DEFINE(rc, "rc", NULL,
+                   rc_settings_handle_set, NULL,
+                   rc_settings_handle_export);
+
+#endif /* SETTINGS enabled */
 
 static inline float clip(float in, float min_out, float max_out) {
     if (in < min_out) {
