@@ -10,4 +10,4 @@ manifest:
       revision: st-half-duplex-uart
       import: true
   self:
-    path: frickelflightcontrol
+    path: zephly

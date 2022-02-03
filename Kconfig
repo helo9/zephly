@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Jonathan Hahn
 # SPDX-License-Identifier: Apache-2.0
 
-menu "frickelflightcontrol"
+menu "zephly"
 
 rsource "drivers/Kconfig"
 rsource "lib/Kconfig"
