@@ -12,15 +12,15 @@ you developing frickelflightcontrol.
 
    .. code-block:: bash
 
-       west init -m git@github.com:helo9/frickelflightcontrol ffc-project
+       west init -m git@github.com:helo9/zephly zephly-project
    
-   Change into the ``ffc-project`` folder and run
+   Change into the ``zephly-project`` folder and run
 
    .. code-block:: bash
 
       west update
 
-   This will clone relevant repositories intro ffc-project. The content of frickelflightcontrol can be found in ``ffc-project/frickelflightcontrol``.
+   This will clone relevant repositories intro ffc-project. The content of zephly can be found in ``zephly-project/zephly``.
 
 #. Build the pwm sample for ``openpilot_cc3d``
 

@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'frickelflightcontrol'
+project = 'zephly'
 copyright = '2022, Jonathan Hahn'
 author = 'Jonathan Hahn'
 

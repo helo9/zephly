@@ -16,9 +16,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          path: frickelflightcontrol
+          path: zephly
       - name: Initialize
-        working-directory: frickelflightcontrol
+        working-directory: zephly
         run: |
           pip3 install -U west
           west init -l .
@@ -26,14 +26,14 @@ jobs:
           west zephyr-export
           pip3 install -r ../zephyr/scripts/requirements-base.txt
       - name: Run Tests
-        working-directory: frickelflightcontrol
+        working-directory: zephly
         run: |
           ../zephyr/scripts/twister -T tests -p native_posix -v
       - name: Build samples
-        working-directory: frickelflightcontrol
+        working-directory: zephly
         run: |
           ../zephyr/scripts/twister -T samples -A boards 
       - name: Build app for openpilot cc3d
-        working-directory: frickelflightcontrol
+        working-directory: zephly
         run: |
           west build --board=openpilot_cc3d app --pristine
