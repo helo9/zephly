@@ -1,3 +1,7 @@
+"""
+Module following https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Importing%20Notebooks.html,
+but only loads cells from notebook, having an "export" tag
+"""
 import io, os, sys, types
 
 from IPython import get_ipython
