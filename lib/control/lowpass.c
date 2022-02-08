@@ -30,6 +30,6 @@ float lowpass_update(struct LowPass *lp, const float x) {
  * 
  * @param lp LowPass filter struct
  */
-void lopwass_reset(struct LowPass *lp) {
+void lowpass_reset(struct LowPass *lp) {
     lp->last_y = 0.0f;
 }

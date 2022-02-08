@@ -45,6 +45,8 @@ void test_lowpass() {
         zassert_within(y, test_data_lp[i][1], 0.001,
                 "wrong output value (row %d)", i);
     }
+
+    lowpass_reset(&lp);
 }
 
 void test_main(void) {
