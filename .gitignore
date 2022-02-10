@@ -7,3 +7,5 @@
 *.log
 .vscode/*
 twister-out*
+*-checkpoint.*
+*.pyc
