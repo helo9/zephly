@@ -8,6 +8,7 @@
 #include <drivers/sensor.h>
 #include <sys/byteorder.h>
 #include <sys/types.h>
+#include <string.h>
 #include "mpu6000.h"
 
 #define DT_DRV_COMPAT invensense_mpu6000
@@ -93,8 +94,8 @@ static void mpu6000_convert_accel(struct sensor_value *val, int16_t raw_value, u
     val->val2 = conv_val % 1000000LL;
 }
 
-static void mpu6000_convert_gyro(struct sensor_value *val, int16_t raw_value, uint16_t sensitivity_x10) {
-    int64_t conv_val = ((int64_t)raw_value * SENSOR_PI * 10) / (sensitivity_x10 * 180);
+static void mpu6000_convert_gyro(struct sensor_value *val, int16_t raw_value, uint16_t sensitivity_x10, int64_t offset) {
+    int64_t conv_val = ((int64_t)raw_value * SENSOR_PI * 10) / (sensitivity_x10 * 180) + offset;
 
     val->val1 = conv_val / 1000000LL;
     val->val2 = conv_val % 1000000LL;
@@ -161,6 +162,9 @@ static int mpu6000_init(const struct device *dev) {
         return ret;
     }
 
+    /* Set gyroscope offset to zero */
+    memset(data->gyro_offsets, 0, sizeof(data->gyro_offsets));
+
     return 0;
 }
 
@@ -168,7 +172,42 @@ static int mpu6000_set(const struct device *dev,
             enum sensor_channel chan,
             enum sensor_attribute attr,
             const struct sensor_value *val) {
-    return -ENOTSUP;
+
+    struct mpu6000_data *data = dev->data;
+    int i, j;
+
+    if (attr != SENSOR_ATTR_OFFSET) {
+        return -ENOTSUP;
+    }
+
+    switch (chan) {
+    case SENSOR_CHAN_GYRO_XYZ:
+        i = 0; j = 2;
+        break;
+    case SENSOR_CHAN_GYRO_X:
+        i = 0; j = 0;
+        break;
+    case SENSOR_CHAN_GYRO_Y:
+        i = 1; j = 1;
+        break;
+    case SENSOR_CHAN_GYRO_Z:
+        i = 2; j = 2;
+        break;
+    default:
+        return -ENOTSUP;
+    }
+
+    if (k_mutex_lock(data->gyro_offset_mutex, K_MSEC(100)) == 0) {
+        for (; i<=j; i++) {
+            data->gyro_offsets[i] = val->val1 * 1000000LL + val->val2;
+        }
+    } else {
+        printk("Cannot lock mpu6000 configuration.\n");
+    }
+
+    k_mutex_unlock(data->gyro_offset_mutex);
+    
+    return 0;   
 }
 
 static int mpu6000_fetch(const struct device *dev,
@@ -185,15 +224,38 @@ static int mpu6000_fetch(const struct device *dev,
         return ret;
     }
 
-    data->accel_x = sys_be16_to_cpu(buf[0]);
-	data->accel_y = sys_be16_to_cpu(buf[1]);
-	data->accel_z = sys_be16_to_cpu(buf[2]);
+    for (int i=0; i<3; i++) {
+        data->accel_measurement[i] = sys_be16_to_cpu(buf[i]);
+    }
+
 	data->temp = sys_be16_to_cpu(buf[3]);
-	data->gyro_x = sys_be16_to_cpu(buf[4]);
-	data->gyro_y = sys_be16_to_cpu(buf[5]);
-	data->gyro_z = sys_be16_to_cpu(buf[6]);
-    
+
+    for (int i=0; i<3; i++) {
+        data->gyro_measurement[i] = sys_be16_to_cpu(buf[4+i]);
+    }
+
     return 0;
+}
+
+static int64_t mpu6000_get_gyro_offset(const struct device *dev, uint8_t gyro_chan) {
+    struct mpu6000_data *data = dev->data;
+    int64_t tmp;
+
+    if (gyro_chan>2) {
+        printk("Wrong gyro_channel, %d", gyro_chan);
+        return 0;
+    }
+
+    if (k_mutex_lock(data->gyro_offset_mutex, K_MSEC(5)) == 0) {
+        tmp = data->gyro_offsets[gyro_chan];
+    } else {
+        printk("Cannot lock mpu6000 configuration to read gyro offsets.\n");
+        tmp = 0;
+    }
+
+    k_mutex_unlock(data->gyro_offset_mutex);
+
+    return tmp;
 }
 
 static int mpu6000_get(const struct device *dev,
@@ -202,32 +264,32 @@ static int mpu6000_get(const struct device *dev,
     
     switch (chan) {
     case SENSOR_CHAN_ACCEL_XYZ:
-        mpu6000_convert_accel(&val[0], data->accel_x, data->accel_sensitivity_shift);
-        mpu6000_convert_accel(&val[1], data->accel_y, data->accel_sensitivity_shift);
-        mpu6000_convert_accel(&val[2], data->accel_z, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[0], data->accel_measurement[0], data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[1], data->accel_measurement[1], data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[2], data->accel_measurement[2], data->accel_sensitivity_shift);
         break;
     case SENSOR_CHAN_ACCEL_X:
-        mpu6000_convert_accel(&val[0], data->accel_x, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[0], data->accel_measurement[0], data->accel_sensitivity_shift);
         break;
     case SENSOR_CHAN_ACCEL_Y:
-        mpu6000_convert_accel(&val[0], data->accel_y, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[0], data->accel_measurement[1], data->accel_sensitivity_shift);
         break;
     case SENSOR_CHAN_ACCEL_Z:
-        mpu6000_convert_accel(&val[0], data->accel_z, data->accel_sensitivity_shift);
+        mpu6000_convert_accel(&val[0], data->accel_measurement[2], data->accel_sensitivity_shift);
         break;
     case SENSOR_CHAN_GYRO_XYZ:
-        mpu6000_convert_gyro(&val[0], data->gyro_x, data->gyro_sensitivity_x10);
-        mpu6000_convert_gyro(&val[1], data->gyro_y, data->gyro_sensitivity_x10);
-        mpu6000_convert_gyro(&val[2], data->gyro_z, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[0], data->gyro_measurement[0], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 0));
+        mpu6000_convert_gyro(&val[1], data->gyro_measurement[1], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 1));
+        mpu6000_convert_gyro(&val[2], data->gyro_measurement[2], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 2));
         break;
     case SENSOR_CHAN_GYRO_X:
-        mpu6000_convert_gyro(&val[0], data->gyro_x, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[0], data->gyro_measurement[0], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 0));
         break;
     case SENSOR_CHAN_GYRO_Y:
-        mpu6000_convert_gyro(&val[0], data->gyro_y, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[0], data->gyro_measurement[1], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 1));
         break;
     case SENSOR_CHAN_GYRO_Z:
-        mpu6000_convert_gyro(&val[0], data->gyro_z, data->gyro_sensitivity_x10);
+        mpu6000_convert_gyro(&val[0], data->gyro_measurement[2], data->gyro_sensitivity_x10, mpu6000_get_gyro_offset(dev, 2));
         break;
     case SENSOR_CHAN_DIE_TEMP:
         mpu6000_convert_temp(&val[0], data->temp);
@@ -247,7 +309,10 @@ static const struct sensor_driver_api mpu6000_api = {
 };
 
 #define CREATE_MPU6000_INIT(i)                        \
-    static struct mpu6000_data mpu6000_data_##i;        \
+    K_MUTEX_DEFINE(mpu6000_mutex_##i);   \
+    static struct mpu6000_data mpu6000_data_##i = {       \
+        .gyro_offset_mutex = &mpu6000_mutex_##i, \
+    };  \
     static struct mpu6000_config mpu6000_config_##i = { \
         .spi = SPI_DT_SPEC_INST_GET(i, SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_WORD_SET(8), 2), \
     };    \

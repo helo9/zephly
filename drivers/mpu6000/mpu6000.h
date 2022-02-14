@@ -28,17 +28,16 @@ struct mpu6000_config {
 };
 
 struct mpu6000_data {
-    int16_t accel_x;
-	int16_t accel_y;
-	int16_t accel_z;
+    int16_t accel_measurement[3];
 	uint16_t accel_sensitivity_shift;
 
 	int16_t temp;
 
-	int16_t gyro_x;
-	int16_t gyro_y;
-	int16_t gyro_z;
+	int16_t gyro_measurement[3];
+	int64_t gyro_offsets[3];
 	uint16_t gyro_sensitivity_x10;
+
+	struct k_mutex *gyro_offset_mutex;
 };
 
 int mpu6000_spi_read(const struct device *dev, uint8_t reg,
