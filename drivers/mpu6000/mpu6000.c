@@ -116,8 +116,8 @@ static int mpu6000_init(const struct device *dev) {
         return -ENODEV;
     }
 
-    /* random wakeup time?? */
-    k_sleep(K_MSEC(1000));
+    /* random wakeup time */
+    k_sleep(K_MSEC(500));
 
     /* wake up device */
     int ret = mpu6000_spi_write_reg(dev, MPU6000_REG_PWR_MGMT1, 0);
@@ -154,6 +154,13 @@ static int mpu6000_init(const struct device *dev) {
         return ret;
     }
 
+    /* Configure low pass filter */
+    ret = mpu6000_spi_write_reg(dev, MPU6000_REG_DLPF_CFG, CONFIG_MPU6000_DLPF_CONFIG);
+    if (ret != 0) {
+        printk("Failed configuring low pass filter\n");
+        return ret;
+    }
+
     return 0;
 }
 
@@ -161,7 +168,7 @@ static int mpu6000_set(const struct device *dev,
             enum sensor_channel chan,
             enum sensor_attribute attr,
             const struct sensor_value *val) {
-    return 0;
+    return -ENOTSUP;
 }
 
 static int mpu6000_fetch(const struct device *dev,
