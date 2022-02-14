@@ -53,6 +53,23 @@ static int cmd_set_reg(const struct shell *sh, size_t argc, char **argv)
     return 0;
 }
 
+static int cmd_set_gyro_offset(const struct shell *sh, size_t argc, char **argv)
+{
+    int ret;
+    struct sensor_value val;
+    double offset = atof(argv[1]);
+    
+    sensor_value_from_double(&val, offset);
+
+    ret = sensor_attr_set(imu, SENSOR_CHAN_GYRO_XYZ, SENSOR_ATTR_OFFSET, &val);
+
+    if (ret != 0) {
+        printk("Could not set gyroscope offset, error %d\n", ret);
+    }
+
+    return 0;
+}
+
 static int cmd_activate(const struct shell *sh, size_t argc, char **argv)
 {
     running = true;
@@ -67,6 +84,7 @@ static int cmd_deactivate(const struct shell *sh, size_t argc, char **argv)
 
 SHELL_CMD_ARG_REGISTER(get_reg, NULL, "Read MPU6000 register", cmd_get_reg, 2, 0);
 SHELL_CMD_ARG_REGISTER(set_reg, NULL, "Set MPU6000 register", cmd_set_reg, 3, 0);
+SHELL_CMD_ARG_REGISTER(set_gyro_offset, NULL, "Set MPU6000 register", cmd_set_gyro_offset, 2, 0);
 SHELL_CMD_REGISTER(activate, NULL, "Print MPU6000 data", cmd_activate);
 SHELL_CMD_REGISTER(deactivate, NULL, "Stop printing MPU6000 data", cmd_deactivate);
 
