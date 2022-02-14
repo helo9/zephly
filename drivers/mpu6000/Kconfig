@@ -27,4 +27,18 @@ config MPU6000_FS_SEL
 	  2 - 1000 deg/s
 	  3 - 2000 deg/s 
 
+config MPU6000_DLPF_CONFIG
+	int "Digital Low Pass filter settings"
+	range 0 6
+	default 0
+	help
+	  This option allows to configure the integrated digital low pass filter
+	  0 - disabled
+	  1 - acc: 184 Hz, gyro: 188 Hz
+	  2 - acc:  94 Hz, gyro:  89 Hz
+	  3 - acc:  44 Hz, gyro:  42 Hz
+	  4 - acc:  21 Hz, gyro:  20 Hz
+	  5 - acc:  10 Hz, gyro:  10 Hz
+	  6 - acc:   5 Hz, gyro:   5 Hz
+
 endif # MPU6000_DRIVER
