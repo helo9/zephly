@@ -1,0 +1,7 @@
+Device STM32F103CB
+SelectInterface SWD
+Speed 4000
+Connect
+r
+h
+LoadBin build_cc3d_exp/zephyr/zephyr.bin 0x00

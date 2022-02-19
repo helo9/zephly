@@ -1,0 +1,8 @@
+# EMAX Skyline32 board configuration
+#
+# Copyright (c) 2022 Kevin Dominic Merkel
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_EMAX_SKYLINE32
+	bool "EMAX Skyline32 board"
+	depends on SOC_STM32F103XB
