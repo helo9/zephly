@@ -1,0 +1,6 @@
+if BOARD_EMAX_SKYLINE32
+
+config BOARD
+	default "emax_skyline32"
+
+endif # BOARD_EMAX_SKYLINE32

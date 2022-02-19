@@ -1,0 +1,105 @@
+/*
+ * Copyright (c) 2022 Kevin Dominic Merkel
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/f1/stm32f103Xb.dtsi>
+#include <st/f1/stm32f103c(8-b)tx-pinctrl.dtsi>
+
+/ {
+	model = "emax_skyline32 board";
+	compatible = "emax,skyline32";
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			gpios = <&gpiob 4 GPIO_ACTIVE_HIGH>;
+			label = "User LED0";
+		};
+	};
+
+	aliases {
+		userled0 = &led0;
+		debuguart = &usart1;
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(12)>;
+	status = "okay";
+};
+
+&pll {
+	mul = <6>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(72)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <2>;
+	apb2-prescaler = <1>;
+};
+
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10 >;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+
+&usart2 {
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "disabled";
+};
+
+&usart3 {
+	pinctrl-0 = <&usart3_tx_pb10 &usart3_rx_pb11>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "disabled";
+};
+
+&i2c1 {
+	pinctrl-0 = < &i2c1_scl_pb8 &i2c1_sda_pb9 >;
+	//pinctrl-0 = < &i2c1_scl_pb6 &i2c1_sda_pb7 >;
+	status = "disabled";
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+
+
+};
+
+&i2c2 {
+	pinctrl-0 = < &i2c2_scl_pb10 &i2c2_sda_pb11 >;
+	status = "okay";
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+
+	imu: mpu6050@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
+		status = "okay";
+		label = "MPU6050";
+		int-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&usb {
+	pinctrl-0 = <&usb_dm_pa11 &usb_dp_pa12>;
+	pinctrl-names = "default";
+};
