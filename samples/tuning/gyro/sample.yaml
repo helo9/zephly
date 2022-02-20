@@ -1,0 +1,10 @@
+sample:
+  name: Gyro tuning sample
+  description:  |
+    This application collects gyro measurements and sends
+    them out in binary form via UART to allow for signal
+    analysis and filter tuning.
+tests:
+  ffc.drivers.mpu600:
+    build_only: true
+    platform_allow: openpilot_cc3d
