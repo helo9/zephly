@@ -30,20 +30,21 @@ static struct Command rc_val = {};
 
 /* setpoints */
 struct sensor_value gyro[3];
-float roll_measurement = 0.0f;
+float measurements[3] = {};
 
 static struct RateControl ratecontrols[3];
 
 static void configure_ratecontrol(struct RateControl *ratecontrols);
+static void get_normalized_measurements(float *measurements, const struct sensor_value *raw_measurement);
 inline struct Command calculate_setpoint(const struct Command &rc_cmd);
-inline struct Command run_ratecontrol(struct RateControl *ratecontrol, const struct Command &setpoints);
+inline struct Command run_ratecontrol(struct RateControl *ratecontrol, const struct Command &setpoints, const float *measruements);
 
 int main() {
 	printk("Starting initialization.\n");
 
-	ratecontrol_init(&ratecontrols[0], "roll");
-	ratecontrol_init(&ratecontrols[1], "yaw");
-	ratecontrol_init(&ratecontrols[2], "pitch");
+	ratecontrol_init(&ratecontrols[0], "pitch");
+	ratecontrol_init(&ratecontrols[1], "roll");
+	ratecontrol_init(&ratecontrols[2], "yaw");
 
 	configure_ratecontrol(ratecontrols);
 
@@ -71,10 +72,11 @@ int main() {
 		/* get new sensor measurements */
 		sensor_sample_fetch(imu);
 		sensor_channel_get(imu, SENSOR_CHAN_GYRO_XYZ, gyro);
+		get_normalized_measurements(measurements, gyro);
 
 		/* get setpoint from rc_val */
 		const auto setpoint = calculate_setpoint(rc_val);
-		const auto commands = run_ratecontrol(ratecontrols, setpoint);
+		const auto commands = run_ratecontrol(ratecontrols, setpoint, measurements);
 		
 		/* run mixer */
 		px_airmode_mix(commands, outputs);
@@ -91,27 +93,36 @@ int main() {
 static void configure_ratecontrol(struct RateControl *ratecontrols) {
 	for (int i=0; i<3; i++) {
 		ratecontrols[i].k_p = 1.0f;
-		ratecontrols[i].k_i = 0.0f;
+		ratecontrols[i].k_i = 0.2f;
 		ratecontrols[i].k_d = 0.0f;
 	}
 }
 
+static void get_normalized_measurements(float *measurements, const struct sensor_value *raw_measurements) {
+	const float MAX_RATE = 15.0f;
+	for (int i=0; i<3; i++) {
+		measurements[i] = sensor_value_to_double(&raw_measurements[i]) / MAX_RATE;
+	}
+}
+
 inline struct Command calculate_setpoint(const struct Command &rc_cmd) {
-	static constexpr float MAX_RATE = 50.0f;
+	static constexpr float MAX_RATE = 1.0f;
 
 	struct Command setpoint;
 	setpoint.pitch  = rc_cmd.pitch * MAX_RATE;
 	setpoint.roll 	= rc_cmd.roll * MAX_RATE;
 	setpoint.yaw	= rc_cmd.yaw * MAX_RATE;
+	setpoint.thrust	= rc_cmd.thrust;
 
 	return setpoint;
 }
 
-inline struct Command run_ratecontrol(struct RateControl *ratecontrols, const struct Command &setpoints) {
+inline struct Command run_ratecontrol(struct RateControl *ratecontrols, const struct Command &setpoints, const float *measruements) {
 	struct Command cmd;
-	cmd.pitch 	= ratecontrol_update(&ratecontrols[0], setpoints.pitch, 0.0f);
-	cmd.roll	= ratecontrol_update(&ratecontrols[1], setpoints.roll, 0.0f);
-	cmd.yaw 	= ratecontrol_update(&ratecontrols[2], setpoints.yaw, 0.0f);
+	cmd.pitch 	= ratecontrol_update(&ratecontrols[0], setpoints.pitch, measurements[0]);
+	cmd.roll	= ratecontrol_update(&ratecontrols[1], setpoints.roll, measurements[1]);
+	cmd.yaw 	= ratecontrol_update(&ratecontrols[2], setpoints.yaw, measurements[2]);
+	cmd.thrust	= setpoints.thrust;
 
 	return cmd;
 }
