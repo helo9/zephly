@@ -15,12 +15,12 @@
 #include <stdio.h>
 
 #include "pwm.hpp"
+#include "zephly_sensors.h"
 
 #define RC_IN DT_NODELABEL(rc)
 #define IMU_NODE DT_NODELABEL(imu)
 
 const struct device *rc = DEVICE_DT_GET(RC_IN);
-const struct device *imu = DEVICE_DT_GET(IMU_NODE);
 
 /* initial pwm values */
 static float outputs[] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -28,18 +28,16 @@ static float outputs[] = {0.0f, 0.0f, 0.0f, 0.0f};
 /* storage for rc inputs */
 static struct Command rc_val = {};
 
-/* setpoints */
-struct sensor_value gyro[3];
-float measurements[3] = {};
+static float measurements[3];
 
 static struct RateControl ratecontrols[3];
 
 static void configure_ratecontrol(struct RateControl *ratecontrols);
-static void get_normalized_measurements(float *measurements, const struct sensor_value *raw_measurement);
 inline struct Command calculate_setpoint(const struct Command &rc_cmd);
 inline struct Command run_ratecontrol(struct RateControl *ratecontrol, const struct Command &setpoints, const float *measruements);
 
 int main() {
+	int ret = 0;
 	printk("Starting initialization.\n");
 
 	ratecontrol_init(&ratecontrols[0], "pitch");
@@ -53,9 +51,10 @@ int main() {
 		return -EIO;
 	}
 
-	if (!device_is_ready(imu)) {
-		printk("Gyro device not ready!\n");
-		return -EIO;
+	ret = zephly_sensors_init();
+	if (ret != 0) {
+		printk("Sensor initialization failed");
+		return ret;
 	}
 
 	auto &pwm = PWM::init();
@@ -70,9 +69,7 @@ int main() {
 		rc_update(rc, &rc_val);
 
 		/* get new sensor measurements */
-		sensor_sample_fetch(imu);
-		sensor_channel_get(imu, SENSOR_CHAN_GYRO_XYZ, gyro);
-		get_normalized_measurements(measurements, gyro);
+		zephly_sensors_get_gyro(measurements);
 
 		/* get setpoint from rc_val */
 		const auto setpoint = calculate_setpoint(rc_val);
@@ -93,15 +90,8 @@ int main() {
 static void configure_ratecontrol(struct RateControl *ratecontrols) {
 	for (int i=0; i<3; i++) {
 		ratecontrols[i].k_p = 1.0f;
-		ratecontrols[i].k_i = 0.2f;
+		ratecontrols[i].k_i = 0.0f;
 		ratecontrols[i].k_d = 0.0f;
-	}
-}
-
-static void get_normalized_measurements(float *measurements, const struct sensor_value *raw_measurements) {
-	const float MAX_RATE = 15.0f;
-	for (int i=0; i<3; i++) {
-		measurements[i] = sensor_value_to_double(&raw_measurements[i]) / MAX_RATE;
 	}
 }
 
