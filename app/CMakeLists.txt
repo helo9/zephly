@@ -9,7 +9,8 @@ project(attitude_estimation)
 
 target_sources(app PRIVATE 
     src/main.cpp
-    src/pwm.cpp 
+    src/pwm.cpp
+    src/zephly_sensors.c
 )
 
 # disable exceptions
