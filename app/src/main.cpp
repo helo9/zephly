@@ -77,6 +77,8 @@ int main() {
 		
 		/* run mixer */
 		px_airmode_mix(commands, outputs);
+
+		/* TODO: add anti wind-up measures */
 		
 		/* write outputs */
 		pwm.write(outputs);

@@ -6,12 +6,10 @@ extern "C" {
 #endif
 
 enum ZEPHLY_SENSOR_AXIS {
-    ZEPHLY_X_AXIS = 0,
-    ZEPHLY_Y_AXIS = 1,
-    ZEPHLY_Z_AXIS = 2
+    ZEPHLY_SENSOR_AXIS_PITCH = 0,
+    ZEPHLY_SENSOR_AXIS_ROLL = 1,
+    ZEPHLY_SENSOR_AXIS_YAW = 2
 };
-
-int zephly_sensors_init();
 
 void zephly_sensors_set_rate(float max_gyro_rates[3]);
 

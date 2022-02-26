@@ -3,6 +3,24 @@
 
 menu "zephly"
 
+menuconfig ZEPHLY_APP
+	bool "The main app of zephly"
+	help
+	  Enable when building the main app.
+
+if ZEPHLY_APP
+
+config ZEPHLY_GYRO_ORIENTATION
+	int "Gyrometer orientation sensor frame to body(drone) frame"
+	range 0 1
+	default 0
+	help
+	  This option allows to select the gyrometer orientation.
+	  0 - No rotation
+	  1 - 180 degree roll
+
+endif # ZEPHLY_APP
+
 rsource "drivers/Kconfig"
 rsource "lib/Kconfig"
 
