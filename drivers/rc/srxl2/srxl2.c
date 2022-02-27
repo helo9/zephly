@@ -23,6 +23,8 @@
 
 #define SPEKTRUM_SRXL_MIN_LENGTH 5
 
+#define SRXL2_RAW_MID_POS 32768
+
 struct srxl2_buffer {
     uint8_t raw_buffer[SRXL_MAX_BUFFER_SIZE];
     uint8_t cursor;
@@ -56,7 +58,7 @@ struct srxl2_data {
     /* this device itself */
     const struct device *dev;
     /* timer for regular running srxl state machine */
-    struct k_timer run_once_timer;
+    struct k_timer run_regular_timer;
     /* work item identifying this driver instance */
     struct k_work run_once_work;
 };
@@ -70,6 +72,10 @@ static void _init_data(struct srxl2_data *data) {
     data->rx_buffer_idx = 0;
     data->tx_buffer.ready = true;
     data->tx_id = 0;
+    data->last_val.pitch = SRXL2_RAW_MID_POS;
+    data->last_val.roll = SRXL2_RAW_MID_POS;
+    data->last_val.yaw = SRXL2_RAW_MID_POS;
+    data->last_val.throttle = 0;
     data->received = false;
 }
 
@@ -181,6 +187,7 @@ static int srxl2_run(const struct device *dev, uint32_t dt) {
 
     if (read_buffer->ready) {
         
+        /* TODO srxlParsePacket seems to return true without receiving packets */
         if(!srxlParsePacket(SRXL_BUS_IDX, read_buffer->raw_buffer, read_buffer->cursor)) {
             ret = -EINVAL;
         } else {
@@ -207,11 +214,11 @@ static void srxl2_work_handler(struct k_work *work) {
 
 static void srxl2_timer_handler(struct k_timer *timer) {
     struct srxl2_data *data = CONTAINER_OF(timer, struct srxl2_data,
-                run_once_timer); 
+                run_regular_timer); 
     k_work_submit(&data->run_once_work);
 }
 
-static int srxl2_rc_init(const struct device *dev) {
+static int srxl2_init(const struct device *dev) {
     struct srxl2_data *data = dev->data;
     const struct srxl2_config *config = dev->config;
 
@@ -244,16 +251,16 @@ static int srxl2_rc_init(const struct device *dev) {
     uart_irq_rx_enable(config->uart);
 
     /* Initialize Timer, Work Item and start Timer */
-    k_timer_init(&data->run_once_timer, srxl2_timer_handler, NULL);
+    k_timer_init(&data->run_regular_timer, srxl2_timer_handler, NULL);
     k_work_init(&data->run_once_work, srxl2_work_handler);
 
-    k_timer_start(&data->run_once_timer, K_MSEC(SRXL_UDPATE_TIMEOUT_MS), K_MSEC(SRXL_UDPATE_TIMEOUT_MS));
+    k_timer_start(&data->run_regular_timer, K_MSEC(SRXL_UDPATE_TIMEOUT_MS), K_MSEC(SRXL_UDPATE_TIMEOUT_MS));
 
     return 0;
 }
 
 static float srxl2_convert(uint16_t raw_value) {
-    return raw_value / 32768.0f - 1.0f;
+    return ((float)raw_value) / SRXL2_RAW_MID_POS - 1.0f;
 }
 
 static void srxl2_update(const struct device *dev, struct Command *rc_val) {
@@ -296,7 +303,7 @@ struct rc_api srxl2_api = {
     static struct srxl2_config srxl2_config_##i = { \
         .uart = DEVICE_DT_GET(DT_INST_BUS(i)), \
     }; \
-    DEVICE_DT_INST_DEFINE(i, &srxl2_rc_init, NULL, \
+    DEVICE_DT_INST_DEFINE(i, &srxl2_init, NULL, \
             &srxl2_data_##i, &srxl2_config_##i, \
             POST_KERNEL, CONFIG_SENSOR_INIT_PRIORITY, \
             &srxl2_api);
