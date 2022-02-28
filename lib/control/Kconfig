@@ -1,4 +1,7 @@
-config FFC_PID_CONTROL_LIB
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config ZEPHLY_CONTROL_LIB
     bool "PID control library"
     help
       Enable the ffc pid control library.
