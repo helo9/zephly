@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Jonathan Hahn
 # SPDX-License-Identifier: Apache-2.0
 
-config FFC_RC_COMMON
+config ZEPHLY_RC_COMMON
     bool "Common rc driver stuff"
     help
         Enable common functions used for rc drivers.
