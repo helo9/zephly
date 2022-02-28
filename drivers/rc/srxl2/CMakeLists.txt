@@ -4,6 +4,6 @@
 zephyr_include_directories(.)
 
 zephyr_library()
-zephyr_library_sources_ifdef(CONFIG_FFC_SRXL2_RC_DRIVER 
+zephyr_library_sources_ifdef(CONFIG_ZEPHLY_SRXL2_RC_DRIVER 
     srxl2.c
     spm_srxl.c)
