@@ -23,6 +23,8 @@ public:
     
     void write(const float (&outputs)[4]);
 
+    void stop_motors();
+
     void print();
 
 private:
