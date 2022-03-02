@@ -36,6 +36,7 @@ struct rc_input {
     uint16_t pitch;
     uint16_t throttle;
     uint16_t yaw;
+    uint16_t armed;
 };
 
 struct srxl2_data {
@@ -195,6 +196,7 @@ static int srxl2_run(const struct device *dev, uint32_t dt) {
             data->last_val.pitch = srxlChData.values[2];
             data->last_val.throttle = srxlChData.values[0];
             data->last_val.yaw = srxlChData.values[3];
+            data->last_val.armed = srxlChData.values[4];
         }
 
         read_buffer->ready = false;
@@ -270,6 +272,7 @@ static void srxl2_update(const struct device *dev, struct Command *rc_val) {
     rc_val->pitch = -1.0f * srxl2_convert(data->last_val.pitch);
     rc_val->thrust = srxl2_convert(data->last_val.throttle) / 2.0f + 0.5f;
     rc_val->yaw =  srxl2_convert(data->last_val.yaw);
+    rc_val->armed = data->last_val.armed > SRXL2_RAW_MID_POS;
 }
 
 void srxl2_transmit_uart(void *dev_ptr, uint8_t * pBuffer, uint8_t length) {

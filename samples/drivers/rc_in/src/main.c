@@ -52,9 +52,10 @@ void main() {
     while (true)  {
         rc_update(receiver, &rc_in);
         if (do_print) {
-            printk("Got roll: %d, pitch: %d, thrust: %d, yaw: %d\n", 
+            printk("Got roll: %d, pitch: %d, thrust: %d, yaw: %d, armed: %d\n", 
                 (int)(rc_in.roll*100), (int)(rc_in.pitch*100), 
-                (int)(rc_in.thrust*100), (int)(rc_in.yaw*100));
+                (int)(rc_in.thrust*100), (int)(rc_in.yaw*100),
+                (int)(rc_in.armed));
 
         }
         
