@@ -81,7 +81,11 @@ int main() {
 		/* TODO: add anti wind-up measures */
 		
 		/* write outputs */
-		pwm.write(outputs);
+		if(rc_val.armed) {
+			pwm.write(outputs);
+		} else {
+			pwm.stop_motors();
+		}
 
 		k_sleep(K_MSEC(10));
 	}

@@ -36,3 +36,9 @@ void PWM::write(const float (&outputs)[4]) {
     *reg = 0x1444;
 #endif
 }
+
+void PWM::stop_motors() {
+    static constexpr float zeros[] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    write(zeros);
+}
