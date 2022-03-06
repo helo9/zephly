@@ -117,8 +117,8 @@ static int rc_cmd_show_settings(const struct shell *sh, size_t argc, char **argv
     return 0;
 }
 
-SHELL_CMD_ARG_REGISTER(rc_set, NULL, "Read MPU6000 register", rc_cmd_settings_set, 3, 0);
-SHELL_CMD_REGISTER(rc_show, NULL, "Print MPU6000 data", rc_cmd_show_settings);
+SHELL_CMD_ARG_REGISTER(rc_set, NULL, "Modify RC settings", rc_cmd_settings_set, 3, 0);
+SHELL_CMD_REGISTER(rc_show, NULL, "Print RC settings", rc_cmd_show_settings);
 
 #endif /* SHELL enabled */
 
