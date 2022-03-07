@@ -15,6 +15,8 @@ int zephly_sensors_init();
 
 void zephly_sensors_set_rate(float max_gyro_rates[3]);
 
+void zephly_gyro_set_offsets(float offset_x, float offset_y, float offset_z);
+
 int zephly_sensors_get_gyro(float measruements[3]);
 
 #ifdef __cplusplus
