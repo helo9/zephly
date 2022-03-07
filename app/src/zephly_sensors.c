@@ -54,6 +54,17 @@ void zephly_sensors_set_rate(float new_max_gyro_rates[3]) {
     memcpy(max_gyro_rates, new_max_gyro_rates, sizeof(max_gyro_rates));
 }
 
+void zephly_gyro_set_offsets(float offset_x, float offset_y, float offset_z) {
+    struct sensor_value val;
+
+    sensor_value_from_double(&val, (double)offset_x);
+    sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
+    sensor_value_from_double(&val, (double)offset_y);
+    sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
+    sensor_value_from_double(&val, (double)offset_y);
+    sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
+}
+
 int zephly_sensors_get_gyro(float measurements[3]) {
     int ret = 0;
     struct sensor_value raw_measurements[3];
