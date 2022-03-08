@@ -9,5 +9,10 @@ manifest:
       remote: custom-zephyr
       revision: st-half-duplex-uart
       import: true
+    - name: jMAVSim
+      remote: custom-zephyr
+      revision: zephyr
+      path: modules/sim/jMAVSim
+      submodules: true
   self:
     path: zephly
