@@ -59,10 +59,12 @@ void zephly_gyro_set_offsets(float offset_x, float offset_y, float offset_z) {
 
     sensor_value_from_double(&val, (double)offset_x);
     sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
+
     sensor_value_from_double(&val, (double)offset_y);
-    sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
-    sensor_value_from_double(&val, (double)offset_y);
-    sensor_attr_set(imu, SENSOR_CHAN_GYRO_X, SENSOR_ATTR_OFFSET, &val);
+    sensor_attr_set(imu, SENSOR_CHAN_GYRO_Y, SENSOR_ATTR_OFFSET, &val);
+
+    sensor_value_from_double(&val, (double)offset_z);
+    sensor_attr_set(imu, SENSOR_CHAN_GYRO_Z, SENSOR_ATTR_OFFSET, &val);
 }
 
 int zephly_sensors_get_gyro(float measurements[3]) {
