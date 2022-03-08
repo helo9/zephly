@@ -1,0 +1,7 @@
+/ {
+	rc: joystick {
+		compatible = "zephly,joystickrc";
+		label = "RECEIVER0";
+		status = "okay";
+	};
+};

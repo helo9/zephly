@@ -13,29 +13,34 @@ struct Command rc_in;
 
 static volatile bool do_print = false;
 
+#if IS_ENABLED(CONFIG_SETTINGS)
+
 static int cmd_save_settings(const struct shell *sh, size_t argc, char **argv) {
     settings_save();
     return 0;
 }
+
+SHELL_CMD_REGISTER(settings_save, NULL, "Save all parameters", cmd_save_settings);
+
+#endif 
 
 static int cmd_toggle_print(const struct shell *sh, size_t argc, char **argv) {
     do_print = !do_print;
     return 0;
 }
 
-SHELL_CMD_REGISTER(settings_save, NULL, "Save all parameters", cmd_save_settings);
+
 SHELL_CMD_REGISTER(toggle_printing, NULL, "Toggle rc value print", cmd_toggle_print);
 
 void main() {
-
-    int rc;
-    
-
     // check for rc device
 	if (!device_is_ready(receiver)) {
 		printk("RC IN device not ready.\n");
 		return;
 	}
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+    int rc;
 
     // check and initialize seetings
     rc = settings_subsys_init();
@@ -48,6 +53,7 @@ void main() {
     if (rc) {
         printk("Failed loading settings from none volatile storage. Failed with error %d\n", rc);
     }
+#endif 
 
     while (true)  {
         rc_update(receiver, &rc_in);
