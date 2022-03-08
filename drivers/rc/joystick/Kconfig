@@ -1,0 +1,18 @@
+config ZEPHLY_JOYSTICK_RC_DRIVER
+    bool "Joytick RC driver for native posix"
+    depends on ZEPHLY_RC_COMMON
+    help
+      Enable Joystick RC driver. It incorporates SDL2 to
+      read the system's first joystick and provide its inputs
+      as regular rc input for zephly.
+
+
+if ZEPHLY_JOYSTICK_RC_DRIVER
+
+config ZEPHLY_JOYSTICK_RC_INIT_PRIORITY
+	int "Current sampling init priority"
+	default 80
+	help
+	  Current sampling initialization priority.
+
+endif #ZEPHLY_JOYSTICK_RC_DRIVER
