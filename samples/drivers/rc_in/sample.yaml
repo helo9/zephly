@@ -6,4 +6,4 @@ sample:
 tests:
   ffc.drivers.rc_in_srxl2:
     build_only: true
-    platform_allow: openpilot_cc3d
+    platform_allow: openpilot_cc3d native_posix_64
