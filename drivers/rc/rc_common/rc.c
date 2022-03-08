@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "kernel.h"
+#include <zephyr.h>
 #include <math.h>
 #include <custom_drivers/rc.h>
 #include <settings/settings.h>

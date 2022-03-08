@@ -4,3 +4,4 @@
 # <vendor-prefix><TAB><Full name of vendor>
 
 spektrum	Horizon Hobby, Inc
+zephly	Zephly Flihgt Control
