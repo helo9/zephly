@@ -38,3 +38,8 @@ jobs:
         working-directory: zephly
         run: |
           west build --board=openpilot_cc3d app --pristine
+      - uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: build-logs
+          path: zephly/twister-out*/**/build.log
