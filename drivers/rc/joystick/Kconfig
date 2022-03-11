@@ -10,9 +10,9 @@ config ZEPHLY_JOYSTICK_RC_DRIVER
 if ZEPHLY_JOYSTICK_RC_DRIVER
 
 config ZEPHLY_JOYSTICK_RC_INIT_PRIORITY
-	int "Current sampling init priority"
+	int "Joystick init priority"
 	default 80
 	help
-	  Current sampling initialization priority.
+	  Joystick initialization priority.
 
 endif #ZEPHLY_JOYSTICK_RC_DRIVER
