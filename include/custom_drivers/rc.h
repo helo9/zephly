@@ -9,8 +9,8 @@
 #include <stdint.h>
 #include <msgs/msgs.h>
 
-#ifndef FFC_RC_H
-#define FFC_RC_H
+#ifndef ZEPHLY_RC_H
+#define ZEPHLY_RC_H
 
 struct rc_api {
 	void (*update)(const struct device *dev, struct Command *rc_in);
@@ -29,4 +29,4 @@ static inline void rc_update(const struct device *dev, struct Command *rc_in) {
 
 void rc_update_expo(const struct device *dev, struct Command *rc_in);
 
-#endif // FFC_RC_H
+#endif // ZEPHLY_RC_H
