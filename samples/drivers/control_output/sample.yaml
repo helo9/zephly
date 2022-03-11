@@ -1,0 +1,9 @@
+sample:
+  name: Control output example application
+  description:  |
+    This application writes control outputs using
+    the output specified in devicetree.
+tests:
+  ffc.drivers.control_output:
+    build_only: true
+    platform_allow: openpilot_cc3d
