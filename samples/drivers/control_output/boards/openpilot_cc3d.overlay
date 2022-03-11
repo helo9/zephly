@@ -1,0 +1,7 @@
+/ {
+	pwmout: pwmout0 {
+		compatible = "zephly,pwmout";
+		label = "PWM_OUT0";
+		status = "okay";
+	};
+};
