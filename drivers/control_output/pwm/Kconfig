@@ -1,0 +1,17 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig CONTROL_OUTPUT_PWM
+	bool "Control output via pwm"
+	help
+		Enable control output via pwm peripherals.
+
+if CONTROL_OUTPUT_PWM
+
+config CONTROL_OUTPUT_PWM_INIT_PRIORITY
+	int "PWM output init priority"
+	default 80
+	help
+		PWM output initialization priority.
+
+endif #CONTROL_OUTPUT_PWM
