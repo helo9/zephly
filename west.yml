@@ -2,17 +2,21 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
-    - name: custom-zephyr
+    - name: private
       url-base: https://github.com/helo9
   projects:
     - name: zephyr
-      remote: custom-zephyr
+      remote: private
       revision: st-half-duplex-uart
       import: true
     - name: jMAVSim
-      remote: custom-zephyr
+      remote: private
       revision: zephyr
       path: modules/sim/jMAVSim
       submodules: true
+    - name: c_library_v2
+      remote: private
+      revision: zephyr
+      path: modules/sim/mavlink
   self:
     path: zephly
