@@ -59,7 +59,7 @@ static void joystick_rc_update(const struct device *dev, struct Command *rc_val)
     SDL_JoystickUpdate();
 
     rc_val->roll   = SDL_JoystickGetAxis(data->joystick0, 0) / JOYSTICK_HALF_RANGE;
-    rc_val->pitch  = SDL_JoystickGetAxis(data->joystick0, 1) / JOYSTICK_HALF_RANGE;
+    rc_val->pitch  = -SDL_JoystickGetAxis(data->joystick0, 1) / JOYSTICK_HALF_RANGE;
     rc_val->thrust = 0.5 * (SDL_JoystickGetAxis(data->joystick0, 2) / JOYSTICK_HALF_RANGE + 1.0f);
     rc_val->yaw    = SDL_JoystickGetAxis(data->joystick0, 3) / JOYSTICK_HALF_RANGE;
     rc_val->armed  = true;
