@@ -10,17 +10,18 @@
 #include <devicetree.h>
 #include <drivers/sensor.h>
 #include <custom_drivers/rc.h>
+#include <custom_drivers/control_output.h>
 #include <mixer/mixer.hpp>
 #include <ratecontrol.h>
 #include <stdio.h>
 
-#include "pwm.hpp"
 #include "zephly_sensors.h"
 
 #define RC_IN DT_NODELABEL(rc)
-#define IMU_NODE DT_NODELABEL(imu)
+#define CONTROL_OUTPUT_NODE DT_NODELABEL(pwmout)
 
 const struct device *rc = DEVICE_DT_GET(RC_IN);
+const struct device *control_out = DEVICE_DT_GET(CONTROL_OUTPUT_NODE);
 
 /* initial pwm values */
 static float outputs[] = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -37,7 +38,7 @@ inline struct Command calculate_setpoint(const struct Command &rc_cmd);
 inline struct Command run_ratecontrol(struct RateControl *ratecontrol, const struct Command &setpoints, const float *measruements);
 
 int main() {
-	int ret = 0;
+
 	printk("Starting initialization.\n");
 
 	ratecontrol_init(&ratecontrols[0], "pitch");
@@ -51,16 +52,16 @@ int main() {
 		return -EIO;
 	}
 
-	ret = zephly_sensors_init();
+	if (!device_is_ready(control_out)) {
+		printk("Control Output not ready.");
+		return -EIO;
+	}
+
+	int ret = zephly_sensors_init();
 	if (ret != 0) {
 		printk("Sensor initialization failed");
 		return ret;
 	}
-
-	auto &pwm = PWM::init();
-
-	/* write initial pwm values */
-	pwm.write(outputs);
 
 	printk("Initialization complete.\nRunning!\n");
 
@@ -82,9 +83,9 @@ int main() {
 		
 		/* write outputs */
 		if(rc_val.armed) {
-			pwm.write(outputs);
+			control_output_set(control_out, outputs);
 		} else {
-			pwm.stop_motors();
+			control_output_disable_motors(control_out);
 		}
 
 		k_sleep(K_MSEC(10));

@@ -9,7 +9,6 @@ project(attitude_estimation)
 
 target_sources(app PRIVATE 
     src/main.cpp
-    src/pwm.cpp
     src/zephly_sensors.c
     src/zephly_sensors_config.c
 )

@@ -31,6 +31,12 @@
 		userled0 = &led0;
 		rc-uart = &usart1;
 	};
+
+	pwmout: pwmout0 {
+		compatible = "zephly,pwmout";
+		label = "PWM_OUT0";
+		status = "okay";
+	};
 };
 
 &clk_hse {
