@@ -11,6 +11,8 @@
 
 bool simulator_is_ready();
 
-void simulator_send_outputs(float outputs[4]);
+void simulator_send_outputs(const float outputs[4]);
+
+int simulator_update_sensor_values(float gyro[3]);
 
 #endif
