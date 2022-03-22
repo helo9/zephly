@@ -1,0 +1,7 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config ZEPHLY_SIMULATOR_CONNECTION
+    bool "Simulator Connection"
+    help
+      Enable the simulator connection on native builds on host machine.
