@@ -16,6 +16,11 @@
 #include <string.h>
 #include <stdio.h>
 
+/* MPU6050 Registers */
+#define MPU6050_DEV_ADR 0x68
+#define MPU6050_RESET_VAL 0x00
+#define MPU6050_PWR_MGMT_1 0x6B
+
 
 /* The devicetree node identifier for the "led0" alias. */
 #define LED_NODE DT_ALIAS(userled0)
@@ -32,7 +37,7 @@ static int cmd_get_reg(const struct shell *sh, size_t argc, char **argv)
     uint8_t reg = (uint8_t)strtol(argv[1], NULL, 16);
 
     uint8_t val;
-    int ret = i2c_reg_read_byte(i2c_dev, (uint16_t) 0x68 , reg, &val);
+    int ret = i2c_reg_read_byte(i2c_dev, (uint16_t) MPU6050_DEV_ADR , reg, &val);
 
     if ( ret != 0 ) {
         printk("Couldn't read register (%d)\n", ret);
@@ -49,7 +54,7 @@ static int cmd_set_reg(const struct shell *sh, size_t argc, char **argv)
     uint8_t reg = (uint8_t)strtol(argv[1], NULL, 16);
     uint8_t val = (uint8_t)strtol(argv[2], NULL, 16);
 
-    int ret = i2c_reg_write_byte(i2c_dev, (uint16_t) 0x68, reg, val);
+    int ret = i2c_reg_write_byte(i2c_dev, (uint16_t) MPU6050_DEV_ADR, reg, val);
 
     if ( ret != 0 ) {
         printk("Error writing register 0x%x\n", reg);
@@ -100,7 +105,7 @@ void main(void)
 
     // This needs to be done to wake up the MPU6050. Temporary solution
     // till the zephyr upstream driver is fixed.
-    ret = i2c_reg_write_byte(i2c_dev, (uint16_t) 0x68, 0x6B, 0x00);
+    ret = i2c_reg_write_byte(i2c_dev, (uint16_t) MPU6050_DEV_ADR, MPU6050_PWR_MGMT_1, MPU6050_RESET_VAL);
 
     if ( ret != 0 ) {
         printk("Error wakeing up the MPU6050");
