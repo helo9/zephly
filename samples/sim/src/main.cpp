@@ -27,23 +27,21 @@ extern "C" {
 #include <minimal/mavlink_msg_heartbeat.h>
 #include <common/mavlink_msg_hil_actuator_controls.h>
 
-#define PORT    14560
+#define NUM_AXIS 3
 
 #define RC_IN DT_NODELABEL(rc)
 
-static void reduce_to_roll_axis(struct Command *rc_in);
+static void init_ratecontrollers(struct RateControl *rate_controllers);
+static void apply_control(struct RateControl *rate_controllers, const struct Command *rc_in, const float gyro[3], struct Command *rate_out);
 
 void main() {
     const struct device *receiver = DEVICE_DT_GET(RC_IN);
-    struct Command rc_in;
-    struct RateControl roll_rate_control;
+    struct Command rc_in, rate_out;
+    struct RateControl rate_controllers[NUM_AXIS];
     float outputs[4];
     float gyro[3];
 
-    ratecontrol_init(&roll_rate_control, "roll");
-    roll_rate_control.k_p = 0.2f;
-    roll_rate_control.k_i = 0.0f;
-    roll_rate_control.k_d = 0.0f;
+    init_ratecontrollers(rate_controllers);
 
 	if (!device_is_ready(receiver)) {
 		printk("RC IN device not ready.\n");
@@ -60,19 +58,13 @@ void main() {
 
         simulator_update_sensor_values(gyro);
 
-        reduce_to_roll_axis(&rc_in);
+        apply_control(rate_controllers, &rc_in, gyro, &rate_out);
 
-        float corrected = ratecontrol_update(&roll_rate_control, rc_in.roll, gyro[0]);
-
-        printk("%d - %d - %d\n", (int)(1000*rc_in.roll), (int)(1000*gyro[0]), (int)(1000*corrected));
-
-        rc_in.roll = corrected;
-
-		px_airmode_mix(rc_in, outputs);
+		px_airmode_mix(rate_out, outputs);
 
         simulator_send_outputs(outputs);
 
-        //printk("out: %d %d %d %d\n", (int)(outputs[0]*100), (int)(outputs[1]*100), (int)(outputs[2]*100), (int)(outputs[3]*100));
+        printk("out: %d %d %d %d\n", (int)(outputs[0]*100), (int)(outputs[1]*100), (int)(outputs[2]*100), (int)(outputs[3]*100));
 
         k_sleep(K_MSEC(10));
     }
@@ -80,8 +72,18 @@ void main() {
     return;
 }
 
+static void init_ratecontrollers(struct RateControl *rate_controllers) {
+    for (int i=0; i<NUM_AXIS; i++) {
+        ratecontrol_init(&rate_controllers[i], "roll");
+        rate_controllers[i].k_p = 0.2f;
+        rate_controllers[i].k_i = 0.0f;
+        rate_controllers[i].k_d = 0.0f;
+    }
+}
 
-static void reduce_to_roll_axis(struct Command *rc_in) {
-    rc_in->pitch = 0.0f;
-    rc_in->yaw = 0.0f;
+static void apply_control(struct RateControl *rate_controllers, const struct Command *rc_in, const float gyro[3], struct Command *rate_out) {
+    rate_out->roll  = ratecontrol_update(&rate_controllers[0], rc_in->roll, gyro[0]);
+    rate_out->pitch = ratecontrol_update(&rate_controllers[0], rc_in->pitch, gyro[1]);
+    rate_out->yaw   = ratecontrol_update(&rate_controllers[0], rc_in->yaw, gyro[2]);
+    rate_out->thrust = rc_in->thrust;
 }
