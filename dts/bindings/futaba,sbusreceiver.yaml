@@ -1,0 +1,8 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+description: Futaba SBUS Receiver
+
+compatible: "futaba,sbusreceiver"
+
+include: uart-device.yaml
