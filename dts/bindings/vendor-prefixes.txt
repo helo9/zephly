@@ -5,3 +5,4 @@
 
 spektrum	Horizon Hobby, Inc
 zephly	Zephly Flihgt Control
+futaba	Futaba Corporation
