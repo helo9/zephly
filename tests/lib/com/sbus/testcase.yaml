@@ -1,0 +1,4 @@
+tests:
+  lib.com.sbus.parser:
+    platform_allow: native_posix
+    tags: communication

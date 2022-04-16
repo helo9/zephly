@@ -3,6 +3,7 @@
 
 menu "Libraries"
 
+rsource "com/Kconfig"
 rsource "control/Kconfig"
 rsource "mixer/Kconfig"
 rsource "simulator_connection/Kconfig"
