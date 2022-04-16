@@ -1,0 +1,7 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config ZEPHLY_SBUS_LIB
+    bool "Servo Bus parsing library"
+    help
+      Enable the library for parsing SBus communication.
