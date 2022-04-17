@@ -2,5 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 rsource "rc_common/Kconfig"
-rsource "srxl2/Kconfig"
 rsource "joystick/Kconfig"
+rsource "sbus/Kconfig"
+rsource "srxl2/Kconfig"

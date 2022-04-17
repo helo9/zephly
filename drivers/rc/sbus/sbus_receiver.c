@@ -11,9 +11,7 @@
 
 #define DT_DRV_COMPAT futaba_sbusreceiver
 
-struct sbus_data {
-    
-};
+struct sbus_data {};
 struct sbus_config {
     const struct device *uart;
 };
