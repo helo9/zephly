@@ -6,8 +6,8 @@ manifest:
       url-base: https://github.com/helo9
   projects:
     - name: zephyr
-      remote: private
-      revision: st-half-duplex-uart
+      remote: zephyrproject-rtos
+      revision: v3.0.0
       import: true
     - name: jMAVSim
       remote: private
