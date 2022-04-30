@@ -13,9 +13,9 @@
 #define GET_PWM(node) DEVICE_DT_GET(DT_NODELABEL(node))
 #define GET_PWM_NUM_PINS(node) 0
 
-#define PWM_PERIOD 20000 /* 50 Hz update rate */
-#define PWM_MIN_DUTY 1000 /* 1ms is minimal duty cycle */
-#define PWM_MAX_DUTY 2000 /* 2ms is maximum duty cycle */
+#define PWM_PERIOD CONFIG_CONTROL_OUTPUT_PWM_PERIOD /* 50 Hz update rate */
+#define PWM_MIN_DUTY CONFIG_CONTROL_OUTPUT_PWM_MIN_DUTY /* 1ms is minimal duty cycle */
+#define PWM_MAX_DUTY CONFIG_CONTROL_OUTPUT_PWM_MAX_DUTY /* 2ms is maximum duty cycle */
 
 struct output_pwm_data {};
 struct output_pwm_config {
