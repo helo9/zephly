@@ -14,4 +14,22 @@ config CONTROL_OUTPUT_PWM_INIT_PRIORITY
 	help
 		PWM output initialization priority.
 
+config CONTROL_OUTPUT_PWM_PERIOD
+	int "Time between two pwm cycles"
+	default 20000
+	help
+		Defines the time between two pwm cycles.
+
+config CONTROL_OUTPUT_PWM_MIN_DUTY
+	int "Minimum duty cycle for pwm output"
+	default 1000
+	help
+		Defines the minimum duty cycle for PWM output.
+
+config CONTROL_OUTPUT_PWM_MAX_DUTY
+	int "Maximum duty cycle for pwm output"
+	default 2000
+	help
+		Defines the maximum duty cycle for PWM output.
+
 endif #CONTROL_OUTPUT_PWM
