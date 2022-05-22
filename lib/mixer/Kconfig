@@ -1,4 +1,4 @@
-config FFC_MIXER_LIB
+config ZEPHLY_MIXER_LIB
     bool "Mixer library"
     help
       Enable the ffc mixer library.
