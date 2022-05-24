@@ -29,7 +29,6 @@ static int cmd_toggle_print(const struct shell *sh, size_t argc, char **argv) {
     return 0;
 }
 
-
 SHELL_CMD_REGISTER(toggle_printing, NULL, "Toggle rc value print", cmd_toggle_print);
 
 void main() {
@@ -62,7 +61,6 @@ void main() {
                 (int)(rc_in.roll*100), (int)(rc_in.pitch*100), 
                 (int)(rc_in.thrust*100), (int)(rc_in.yaw*100),
                 (int)(rc_in.armed));
-
         }
         
         k_sleep(K_MSEC(500));

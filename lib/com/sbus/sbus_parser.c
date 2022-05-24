@@ -6,8 +6,9 @@
 
 #include <errno.h>
 #include <math.h>
-#include <sbus_parser.h>
 #include <stdint.h>
+#include <sbus_parser.h>
+
 
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
@@ -105,6 +106,8 @@ int sbus_parse_buffer(struct SBusBuffer *buffer, struct SBusData *data) {
     const uint8_t flags_byte_position = SBUS_RECV_BUFFER_SIZE - 2;
     const uint8_t flags_byte = buffer->data[flags_byte_position];
     sbus_parse_flags_byte(flags_byte, data);
+
+    reset_buffer(buffer);
 
     return 0;
 }
