@@ -57,11 +57,11 @@ int main() {
 		return -EIO;
 	}
 
-	int ret = zephly_sensors_init();
+	/*int ret = zephly_sensors_init();
 	if (ret != 0) {
-		printk("Sensor initialization failed");
+		printk("Sensor initialization failed, error code: %d.", ret);
 		return ret;
-	}
+	}*/
 
 	printk("Initialization complete.\nRunning!\n");
 
@@ -70,14 +70,16 @@ int main() {
 		rc_update(rc, &rc_val);
 
 		/* get new sensor measurements */
-		zephly_sensors_get_gyro(measurements);
+		//zephly_sensors_get_gyro(measurements);
 
 		/* get setpoint from rc_val */
 		const auto setpoint = calculate_setpoint(rc_val);
-		const auto commands = run_ratecontrol(ratecontrols, setpoint, measurements);
+		//const auto commands = run_ratecontrol(ratecontrols, setpoint, measurements);
+
+		printk("%d\n", (int)(setpoint.thrust * 1000));
 		
 		/* run mixer */
-		px_airmode_mix(commands, outputs);
+		px_airmode_mix(setpoint, outputs);
 
 		/* TODO: add anti wind-up measures */
 		

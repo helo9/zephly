@@ -1,7 +1,8 @@
 # Copyright (c) 2022 Jonathan Hahn
 # SPDX-License-Identifier: Apache-2.0
 
-rsource "rc_common/Kconfig"
-rsource "joystick/Kconfig"
+menu "Communication"
+
 rsource "sbus/Kconfig"
-rsource "srxl2/Kconfig"
+
+endmenu

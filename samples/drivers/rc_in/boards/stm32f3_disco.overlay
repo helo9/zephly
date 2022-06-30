@@ -1,0 +1,13 @@
+/*
+ * Copyright (c) 2022 Jonathan Hahn
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&uart4 {
+    rc: sbus {
+        compatible = "futaba,sbusreceiver";
+        label = "RECEIVER0";
+        status = "okay";
+    };
+};

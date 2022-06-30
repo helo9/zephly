@@ -1,0 +1,18 @@
+/ {
+    aliases {
+        rc-uart = &usart2;
+    };
+};
+
+&pwm1 {
+    pinctrl-0 = <&tim1_ch1n_pe8 &tim1_ch2n_pe10 &tim1_ch3n_pe12 &tim1_ch4_pe14>;
+};
+
+&usart2 {
+    single-wire;
+	rc: srxl2 {
+		compatible = "spektrum,srxl2receiver";
+		label = "RECEIVER0";
+		status = "okay";
+	};
+};
