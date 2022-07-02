@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "simulator_connection_network.h"
+#include "simulator_network_socket.h"
 
 #define SIMULATOR_IP "127.0.0.1"
 #define SIMULATOR_PORT    14560
@@ -21,7 +21,7 @@ static void simulator_initialize_sockaddr(struct sockaddr_in *addr) {
     addr->sin_addr.s_addr = inet_addr(SIMULATOR_IP);
 }
 
-int simulator_initialize_network(struct simulator_network_data *data) {
+int simulator_socket_initialize(struct simulator_socket *data) {
 
     simulator_initialize_sockaddr(&data->servaddr);
 
@@ -34,13 +34,13 @@ int simulator_initialize_network(struct simulator_network_data *data) {
     return 0;
 }
 
-int simulator_send(const struct simulator_network_data *data, uint8_t *buf, size_t buf_len) {
+int simulator_socket_send(const struct simulator_socket *data, uint8_t *buf, size_t buf_len) {
     return sendto(data->sockfd, (const char*)buf, buf_len,
         MSG_CONFIRM, (const struct sockaddr *)&data->servaddr,
         sizeof(data->servaddr));
 }
 
-int simulator_receive(struct simulator_network_data *data, uint8_t *buf, size_t buf_len) {
+int simulator_socket_receive(struct simulator_socket *data, uint8_t *buf, size_t buf_len) {
     struct sockaddr servaddr;
     int servaddr_len;
 

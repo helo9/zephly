@@ -8,10 +8,10 @@
 #define ZEPHLY_SIMULATOR_INTERNAL_H
 
 #include <simulator_connection.h>
-#include "simulator_connection_network.h"
+#include "simulator_network_socket.h"
 
 struct simulator_data {
-    struct simulator_network_data nw_data;
+    struct simulator_socket sim_socket;
     bool ready;
 };
 

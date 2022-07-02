@@ -15,13 +15,13 @@
 static int simulator_start_heartbeat_stream(struct simulator_data *data);
 
 static struct simulator_data data = {
-    .nw_data = {},
+    .sim_socket = {},
     .ready = false
 };
 
 static int simulator_init() {
 
-    int ret = simulator_initialize_network(&data.nw_data);
+    int ret = simulator_socket_initialize(&data.sim_socket);
 
     if (ret < 0) {
         printk("socket creation failed, error %d", ret);;
@@ -48,7 +48,7 @@ void simulator_send_heartbeat() {
         return;
     }
 
-    simulator_send(&data.nw_data, buf, length);
+    simulator_socket_send(&data.sim_socket, buf, length);
 }
 
 void simulator_send_outputs(const float outputs[4]) {
@@ -60,14 +60,14 @@ void simulator_send_outputs(const float outputs[4]) {
         return;
     }
 
-    simulator_send(&data.nw_data, buf, length);
+    simulator_socket_send(&data.sim_socket, buf, length);
 }
 
 int simulator_update_sensor_values(float gyro[3]) {
 
     while (true) {
         uint8_t buf[MAVLINK_MAX_PACKET_LEN];
-        int bytes_received = simulator_receive(&data.nw_data, buf, MAVLINK_MAX_PACKET_LEN);
+        int bytes_received = simulator_socket_receive(&data.sim_socket, buf, MAVLINK_MAX_PACKET_LEN);
 
         if (bytes_received > 0) {
             simulator_parse_message(buf, bytes_received, gyro);
