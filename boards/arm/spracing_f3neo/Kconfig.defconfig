@@ -1,0 +1,6 @@
+if BOARD_SPRF3NEO
+
+config BOARD
+	default "spracing_f3neo"
+
+endif # BOARD_SPRF3NEO

@@ -1,0 +1,8 @@
+# SPRacing F3 Neo board configuration
+#
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_SPRF3NEO
+	bool "SPRacing F3 Neo board"
+	depends on SOC_STM32F103XB
