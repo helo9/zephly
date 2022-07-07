@@ -1,0 +1,60 @@
+menuconfig ICM20602_DRIVER
+	bool "ICM20602 SPI driver"
+	help
+	  Enable ICM20602 SPI drivers.
+
+if ICM20602_DRIVER
+
+config ICM20602_AFS_SEL
+	int "Accelerometer Full Scale Selection"
+	range 0 3
+	default 1
+	help
+	  This option allows to select the accelerometer range.
+	  0 -  2g
+	  1 -  4g
+	  2 -  8g
+	  3 - 16g
+
+config ICM20602_FS_SEL
+	int "Gyrometer Full Scale Selection"
+	range 0 3
+	default 1
+	help
+	  This option allows to select the gyrometer range.
+	  0 -  250 deg/s
+	  1 -  500 deg/s
+	  2 - 1000 deg/s
+	  3 - 2000 deg/s 
+
+config ICM20602_DLPF_GYRO_TEMP_CONFIG
+	int "Digital Low Pass filter settings for gyro and temperature"
+	range 0 7
+	default 0
+	help
+	  This option allows to configure the integrated digital low pass filter and -3dB is reached at
+	  0 -  250 Hz
+	  1 -  176 Hz
+	  2 -   92 Hz
+	  3 -   41 Hz
+	  4 -   20 Hz
+	  5 -   10 Hz
+	  6 -    5 Hz
+	  7 - 3281 Hz
+
+config ICM20602_DLPF_ACCEL_CONFIG
+	  int "Digital Low Pass filter settings for accelerometer"
+	  range 0 7
+	  default 0
+	  help
+		This option allows to configure the integrated digital low pass filter and -3dB is reached at
+		0 - 218.1 Hz
+		1 - 218.1 Hz
+		2 -  99.0 Hz
+		3 -  44.8 Hz
+		4 -  21.2 Hz
+		5 -  10.2 Hz
+		6 -   5.1 Hz
+		7 - 420.0 Hz
+
+endif # ICM20602_DRIVER

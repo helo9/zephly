@@ -1,0 +1,17 @@
+# Copyright (c) 2019 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+description: ICM-20602 high performance 6-Axis MEMS Motion Tracking
+
+compatible: "invensense,icm20602"
+
+include: spi-device.yaml
+
+properties:
+    int-gpios:
+      type: phandle-array
+      required: false
+      description: |
+        The INT signal default configuration is active-high.  The
+        property value should ensure the flags properly describe the
+        signal that is presented to the driver.

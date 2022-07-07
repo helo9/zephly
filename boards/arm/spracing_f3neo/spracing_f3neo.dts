@@ -58,16 +58,25 @@
 	apb2-prescaler = <1>;
 };
 
-&usart1 {
-	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
-	pinctrl-names = "default";
-	current-speed = <115200>;
-	status = "okay";
-};
-
 &usart2 {
 	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
 	pinctrl-names = "default";
 	current-speed = <115200>;
 	status = "okay";
+};
+
+&spi1 {
+	pinctrl-0 = <&spi1_nss_pa4 &spi1_sck_pa5
+		     &spi1_miso_pa6 &spi1_mosi_pa7>;
+	cs-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	imu: mpu6500@0 {
+		compatible = "invensense,icm20602";
+		reg = <0>;
+		spi-max-frequency = < DT_FREQ_K(300) >;
+		label = "MPU-6500";
+		status = "okay";
+	};
 };

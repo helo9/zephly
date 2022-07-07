@@ -4,6 +4,7 @@
 menu "Drivers"
 
 rsource "mpu6000/Kconfig"
+rsource "icm20602/Kconfig"
 rsource "rc/Kconfig"
 rsource "control_output/pwm/Kconfig"
 
