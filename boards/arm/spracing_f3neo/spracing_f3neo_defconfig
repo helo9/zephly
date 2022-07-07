@@ -25,5 +25,17 @@ CONFIG_GPIO=y
 # Enable Clocks
 CONFIG_CLOCK_CONTROL=y
 
-# enable pin controller
+# Enable pin controller
 CONFIG_PINCTRL=y
+
+# disable jtag to get PB3, PB4 free
+CONFIG_GPIO_STM32_SWJ_NOJTAG=y
+
+# Enable SPI
+CONFIG_SPI=y
+
+# Enable Sensors
+CONFIG_SENSOR=y
+
+# Enable IMU
+CONFIG_ICM20602_DRIVER=y
