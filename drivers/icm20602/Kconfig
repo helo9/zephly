@@ -1,5 +1,6 @@
 menuconfig ICM20602_DRIVER
 	bool "ICM20602 SPI driver"
+	depends on LOG
 	help
 	  Enable ICM20602 SPI drivers.
 
