@@ -3,6 +3,8 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#define DT_DRV_COMPAT invensense_icm20602
+
 #include <init.h>
 #include <devicetree.h>
 #include <drivers/sensor.h>
@@ -10,7 +12,8 @@
 #include <sys/types.h>
 #include "icm20602.h"
 
-#define DT_DRV_COMPAT invensense_icm20602
+#include <logging/log.h>
+LOG_MODULE_REGISTER(ICM20602, CONFIG_SENSOR_LOG_LEVEL);
 
 const static uint16_t gyro_sensitivities_x10[4] = {1310, 655, 328, 164};
 
@@ -107,37 +110,72 @@ static void icm20602_convert_temp(struct sensor_value *val, int16_t raw_value) {
     val->val2 = conv_val % 1000000LL;
 }
 
-static int icm20602_init(const struct device *dev) {
-    struct icm20602_data *data = dev->data;
+static inline bool icm20602_spi_is_ready(const struct device *dev) {
     const struct icm20602_config *config = dev->config;
 
-    if (!spi_is_ready(&config->spi)) {
-        printk("SPI not ready\n");
+    return spi_is_ready(&config->spi);
+}
+
+static int icm20602_init(const struct device *dev) {
+    struct icm20602_data *data = dev->data;
+    
+    if (!icm20602_spi_is_ready(dev)) {
+        LOG_ERR("SPI not ready\n");
         return -ENODEV;
     }
-
-    /* random wakeup time */
-    k_sleep(K_MSEC(500));
-
 
     /* check who am i register for correct value */
     uint8_t wai = 0;
     int ret = icm20602_spi_read(dev, ICM20602_REG_WHO_AM_I, &wai, 1);
     if ( ret != 0 ) {
-        printk("WAI request failed\n");
+        LOG_ERR("Requesting Who Am I failed\n");
         return ret;
     }
 
     if ( wai != ICM20602_WHO_AM_I ) {
-        printk("WAI is wrong (%d)\n", wai);
+        LOG_ERR("Who I Am ID has wrong value (%d)\n", wai);
         return -ENODEV;
+    }
+
+    /* reset sensor */
+    icm20602_spi_write_reg(dev, ICM20602_REG_POWER_MANAGEMENT_1, BIT(7));
+
+    /* random wakeup time */
+    k_sleep(K_MSEC(500));
+
+    /* Disable FIFO mode */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_FIFO_EN, 0x00);
+    if ( ret != 0 ) {
+        LOG_ERR("Failed to disable FIFO mode\n");
+        return ret;
+    }
+
+    /* Tinker around with first PWR_MGMT register */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_POWER_MANAGEMENT_1, 0x00);
+    if ( ret != 0 ) {
+        LOG_ERR("Failed to set PWR_MGMT_1\n");
+        return ret;
+    }
+
+    /* Do something similiar with second PWR_MGMT register */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_POWER_MANAGEMENT_2, 0x00);
+    if ( ret != 0 ) {
+        LOG_ERR("Failed to set PWR_MGMT_2\n");
+        return ret;
+    }
+
+    /* Disable I2C Interface */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_I2C_INTERFACE, BIT(6));
+    if ( ret != 0 ) {
+        LOG_ERR("Failed to disable I2C interface\n");
+        return ret;
     }
 
     /* Set gyro range */
     data->gyro_sensitivity_x10 = gyro_sensitivities_x10[CONFIG_ICM20602_FS_SEL];
     ret = icm20602_spi_write_reg(dev, ICM20602_REG_GYRO_CONFIG, CONFIG_ICM20602_FS_SEL << 3);
     if ( ret != 0 ) {
-        printk("Failed setting GYRO CFG\n");
+        LOG_ERR("Failed setting GYRO CFG\n");
         return ret;
     }
 
@@ -145,70 +183,26 @@ static int icm20602_init(const struct device *dev) {
     data->accel_sensitivity_shift = 14 - CONFIG_ICM20602_AFS_SEL;
     ret = icm20602_spi_write_reg(dev, ICM20602_REG_ACCEL_CONFIG, CONFIG_ICM20602_AFS_SEL << 3);
     if ( ret != 0 ) {
-        printk("Failed setting GYRO CFG\n");
+        LOG_ERR("Failed setting GYRO CFG\n");
         return ret;
     }
 
     /* Configure low pass filter gyro and temperature */
     ret = icm20602_spi_write_reg(dev, ICM20602_REG_CONFIG, CONFIG_ICM20602_DLPF_GYRO_TEMP_CONFIG);
     if (ret != 0) {
-        printk("Failed configuring low pass filter for gyro and temperature\n");
+        LOG_ERR("Failed configuring low pass filter for gyro and temperature\n");
         return ret;
     }
 
     /* Configure low pass filter accelerometer */
     ret = icm20602_spi_write_reg(dev, ICM20602_REG_ACCEL_CONFIG2, CONFIG_ICM20602_DLPF_ACCEL_CONFIG);
     if (ret != 0) {
-        printk("Failed configuring low pass filter for gyro and temperature\n");
+        LOG_ERR("Failed configuring low pass filter for gyro and temperature\n");
         return ret;
     }
 
     return 0;
 }
-
-#if 0
-static int icm20602_set(const struct device *dev,
-            enum sensor_channel chan,
-            enum sensor_attribute attr,
-            const struct sensor_value *val) {
-
-    struct icm20602_data *data = dev->data;
-    int i, j;
-
-    if (attr != SENSOR_ATTR_OFFSET) {
-        return -ENOTSUP;
-    }
-
-    switch (chan) {
-    case SENSOR_CHAN_GYRO_XYZ:
-        i = 0; j = 2;
-        break;
-    case SENSOR_CHAN_GYRO_X:
-        i = 0; j = 0;
-        break;
-    case SENSOR_CHAN_GYRO_Y:
-        i = 1; j = 1;
-        break;
-    case SENSOR_CHAN_GYRO_Z:
-        i = 2; j = 2;
-        break;
-    default:
-        return -ENOTSUP;
-    }
-
-    if (k_mutex_lock(data->gyro_offset_mutex, K_MSEC(100)) == 0) {
-        for (; i<=j; i++) {
-            data->gyro_offsets[i] = val->val1 * 1000000LL + val->val2;
-        }
-    } else {
-        printk("Cannot lock icm20602 configuration.\n");
-    }
-
-    k_mutex_unlock(data->gyro_offset_mutex);
-    
-    return 0;   
-}
-#endif
 
 static int icm20602_fetch(const struct device *dev,
                         enum sensor_channel chan) {
