@@ -6,6 +6,11 @@ menuconfig ICM20602_DRIVER
 
 if ICM20602_DRIVER
 
+config ICM20602_TRIGGER
+	bool "External data ready trigger"
+	help
+	  Enable ICM20602 data ready trigger.
+
 config ICM20602_AFS_SEL
 	int "Accelerometer Full Scale Selection"
 	range 0 3
@@ -57,5 +62,12 @@ config ICM20602_DLPF_ACCEL_CONFIG
 		5 -  10.2 Hz
 		6 -   5.1 Hz
 		7 - 420.0 Hz
+
+config ICM20602_SAMPLE_RATE_DIVIDER
+	int "Sample rate divider that controls the data ouput / fifo sample rate"
+	range 1 255
+	default 1
+	help
+	  This option allows to adapt the sample rate for measurement aquisition.
 
 endif # ICM20602_DRIVER

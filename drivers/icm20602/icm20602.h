@@ -6,9 +6,13 @@
 
 #include <device.h>
 #include <drivers/spi.h>
+#include <drivers/gpio.h>
+#include <drivers/sensor.h>
 
 #ifndef ZEPHLY_DRIVERS_MPU6000_H_
 #define ZEPHLY_DRIVERS_MPU6000_H_
+
+#define ICM20602_REG_SMPLRT_DIV 0x19U
 
 #define ICM20602_REG_CONFIG	0x1AU
 #define ICM20602_REG_GYRO_CONFIG	0x1BU
@@ -16,6 +20,9 @@
 #define ICM20602_REG_ACCEL_CONFIG2	0x1DU
 
 #define ICM20602_REG_FIFO_EN	0x023U
+
+#define ICM20602_REG_INT_PIN_CFG 0x37U
+#define ICM20602_REG_INT_ENABLE 0x38U
 
 #define ICM20602_REG_ACCEL_XOUT_H	0x3BU
 #define ICM20602_REG_ACCEL_XOUT_L	0x3CU
@@ -49,8 +56,16 @@
 
 #define ICM20602_WHO_AM_I	0x12U
 
+#ifdef CONFIG_ICM20602_TRIGGER
+int icm20602_trigger_set(const struct device *dev, const struct sensor_trigger *trig, sensor_trigger_handler_t handler);
+int icm20602_trigger_init(const struct device *dev);
+#endif
+
 struct icm20602_config {
     struct spi_dt_spec spi;
+#ifdef CONFIG_ICM20602_TRIGGER
+	const struct gpio_dt_spec gpio_data_rdy;
+#endif
 };
 
 struct icm20602_data {
@@ -60,10 +75,12 @@ struct icm20602_data {
 	int16_t temp;
 
 	int16_t gyro_measurement[3];
-	int64_t gyro_offsets[3];
 	uint16_t gyro_sensitivity_x10;
 
-	struct k_mutex *gyro_offset_mutex;
+#ifdef CONFIG_ICM20602_TRIGGER
+	struct gpio_callback gpio_cb;
+	sensor_trigger_handler_t sensor_cb;
+#endif
 };
 
 #endif /* ZEPHLY_DRIVERS_MPU6000_H_ */
