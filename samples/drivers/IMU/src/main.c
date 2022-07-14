@@ -13,7 +13,7 @@
 
 const struct device *imu = DEVICE_DT_GET(DT_NODELABEL(imu));
 
-void collect_imu_values(struct k_work *work) {
+static void collect_imu_values(struct k_work *work) {
 
     struct sensor_value values[3];
 
@@ -45,12 +45,18 @@ void collect_imu_values(struct k_work *work) {
 K_WORK_DEFINE(imu_work, collect_imu_values);
 
 
-void measurement_timer_handler(struct k_timer *dummy)
+static void measurement_timer_handler(struct k_timer *dummy)
 {
     k_work_submit(&imu_work);
 }
 
 K_TIMER_DEFINE(measurement_timer, measurement_timer_handler, NULL);
+
+static void imu_trigger_handler(const struct device *dev,
+				    const struct sensor_trigger *trig)
+{
+    k_work_submit(&imu_work);
+}
 
 void main(void)
 {
@@ -61,5 +67,15 @@ void main(void)
         return;
     }
 
-    k_timer_start(&measurement_timer, K_MSEC(500), K_MSEC(500));
+    const struct sensor_trigger trig = {
+        .type = SENSOR_TRIG_DATA_READY,
+		.chan = SENSOR_CHAN_GYRO_XYZ,
+    };
+
+    int ret = sensor_trigger_set(imu, &trig, imu_trigger_handler);
+
+    if (ret != 0) {
+        printf("IMU does not support trigger, we use timer instead.\n");
+        k_timer_start(&measurement_timer, K_MSEC(500), K_MSEC(500));
+    }
 }
