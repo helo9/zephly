@@ -5,9 +5,7 @@
 
 #define DT_DRV_COMPAT invensense_icm20602
 
-#include <init.h>
 #include <devicetree.h>
-#include <drivers/sensor.h>
 #include <sys/byteorder.h>
 #include <sys/types.h>
 #include "icm20602.h"
@@ -201,6 +199,34 @@ static int icm20602_init(const struct device *dev) {
         return ret;
     }
 
+    /* Configure sample rate divider */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_SMPLRT_DIV, CONFIG_ICM20602_SAMPLE_RATE_DIVIDER);
+    if (ret != 0) {
+        LOG_ERR("Failed configuring low pass filter for gyro and temperature\n");
+        return ret;
+    }
+
+#if CONFIG_ICM20602_TRIGGER
+    /* Configure interrupt pins */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_INT_PIN_CFG, 0x10);
+    if (ret != 0) {
+        LOG_ERR("Failed configuring interrupt pins\n");
+        return ret;
+    }
+
+    /* Enable interrupts */
+    ret = icm20602_spi_write_reg(dev, ICM20602_REG_INT_ENABLE, BIT(0));
+    if (ret != 0) {
+        LOG_ERR("Failed enabling data ready interrupt\n");
+        return ret;
+    }
+
+    ret = icm20602_trigger_init(dev);
+    if (ret != 0) {
+        LOG_ERR("Failed to initialise interrupt configuration\n");
+    }
+#endif 
+
     return 0;
 }
 
@@ -280,18 +306,33 @@ static int icm20602_get(const struct device *dev,
 }
 
 static const struct sensor_driver_api icm20602_api = {
-	.attr_set = NULL,
+#if CONFIG_ICM20602_TRIGGER
+	.trigger_set = icm20602_trigger_set,
+#endif
 	.sample_fetch = icm20602_fetch,
 	.channel_get = icm20602_get,
 };
 
+#if CONFIG_ICM20602_TRIGGER
+
+#define GPIO_DT_SPEC_INST_GET_BY_IDX_COND(id, prop, idx) \
+	COND_CODE_1(DT_INST_PROP_HAS_IDX(id, prop, idx), \
+		    (GPIO_DT_SPEC_INST_GET_BY_IDX(id, prop, idx)), \
+		    ({.port = NULL, .pin = 0, .dt_flags = 0}))
+
+#define ICM20602_TRIGGER_CONFIG(inst) \
+    .gpio_data_rdy = \
+        GPIO_DT_SPEC_INST_GET_BY_IDX_COND(inst, int_gpios, 0),
+#else
+#define ICM20602_TRIGGER_CONFIG(int)
+#endif
+
 #define CREATE_ICM20602_INIT(i)                        \
-    K_MUTEX_DEFINE(icm20602_mutex_##i);   \
     static struct icm20602_data icm20602_data_##i = {       \
-        .gyro_offset_mutex = &icm20602_mutex_##i, \
     };  \
     static struct icm20602_config icm20602_config_##i = { \
         .spi = SPI_DT_SPEC_INST_GET(i, SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_WORD_SET(8), 2), \
+        ICM20602_TRIGGER_CONFIG(i)\
     };    \
     DEVICE_DT_INST_DEFINE(i, &icm20602_init, NULL,    \
     	    &icm20602_data_##i, &icm20602_config_##i,     \
