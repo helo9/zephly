@@ -76,6 +76,7 @@
 		compatible = "invensense,icm20602";
 		reg = <0>;
 		spi-max-frequency = < DT_FREQ_K(300) >;
+		int-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
 		label = "MPU-6500";
 		status = "okay";
 	};
