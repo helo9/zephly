@@ -122,7 +122,7 @@
 &timers3 {
 	pwm3: pwm {
 		status = "okay";
-		pinctrl-0 = <&tim3_ch1_pwm_pb4>;
+		pinctrl-0 = <&tim3_ch1_remap1_pwm_pb4>;
 		pinctrl-names = "default";
 	};
 };

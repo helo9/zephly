@@ -16,9 +16,6 @@ CONFIG_UART_CONSOLE=y
 # enable pinmux
 CONFIG_PINMUX=y
 
-# disable jtag to get PB3 free
-CONFIG_GPIO_STM32_SWJ_NOJTAG=y
-
 # enable GPIO
 CONFIG_GPIO=y
 
