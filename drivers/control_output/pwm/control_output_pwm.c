@@ -39,22 +39,22 @@ static uint32_t get_pulse(float setpoint) {
 static int output_pwm_set(const struct device *dev, const float outputs[4]) {
     const struct output_pwm_config *config = (const struct output_pwm_config*)dev->config;
 
-    int ret = pwm_pin_set_usec(config->pwm_dev[0], 4, PWM_PERIOD, get_pulse(outputs[0]), 0);
+    int ret = pwm_set(config->pwm_dev[0], 4, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[0])), 0);
     if (ret < 0) {
         return ret;
     }
 
-    ret = pwm_pin_set_usec(config->pwm_dev[0], 3, PWM_PERIOD, get_pulse(outputs[1]), 0);
+    ret = pwm_set(config->pwm_dev[0], 3, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[1])), 0);
     if (ret < 0) {
         return ret;
     }
 
-    ret = pwm_pin_set_usec(config->pwm_dev[0], 2, PWM_PERIOD, get_pulse(outputs[2]), 0);
+    ret = pwm_set(config->pwm_dev[0], 2, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[2])), 0);
     if (ret < 0) {
         return ret;
     }
 
-    ret = pwm_pin_set_usec(config->pwm_dev[1], 1, PWM_PERIOD, get_pulse(outputs[3]), 0);
+    ret = pwm_set(config->pwm_dev[1], 1, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[3])), 0);
     if (ret < 0) {
         return ret;
     }
