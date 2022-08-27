@@ -9,6 +9,8 @@
 
 #define DT_DRV_COMPAT zephly_pwmout
 
+#define PWM_OUTPUT_CHANNELS 4
+
 #define NODE_OKAY(node) DT_NODE_HAS_STATUS(DT_NODELABEL(node), okay)
 #define GET_PWM(node) DEVICE_DT_GET(DT_NODELABEL(node))
 #define GET_PWM_NUM_PINS(node) 0
@@ -19,14 +21,16 @@
 
 struct output_pwm_data {};
 struct output_pwm_config {
-    const struct device *pwm_dev[2];
+    const struct pwm_dt_spec pwms[PWM_OUTPUT_CHANNELS];
 };
 
 static int output_pwm_init(const struct device *dev) {
     const struct output_pwm_config *config = (const struct output_pwm_config*)dev->config;
 
-    if (!device_is_ready(config->pwm_dev[0]) && !device_is_ready(config->pwm_dev[1]) ) {
-        return -EIO;
+    for (int i=0; i<4; i++) {
+        if (!device_is_ready(config->pwms[i].dev)) {
+            return -EIO;
+        }
     }
 
     return 0;
@@ -39,24 +43,14 @@ static uint32_t get_pulse(float setpoint) {
 static int output_pwm_set(const struct device *dev, const float outputs[4]) {
     const struct output_pwm_config *config = (const struct output_pwm_config*)dev->config;
 
-    int ret = pwm_set(config->pwm_dev[0], 4, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[0])), 0);
-    if (ret < 0) {
-        return ret;
-    }
+    for (int i=0; i<4; i++) {
+        const struct pwm_dt_spec *tmp = &config->pwms[i];
+        const uint32_t pulse = get_pulse(outputs[i]);
+        int ret = pwm_set(tmp->dev, tmp->channel, PWM_USEC(PWM_PERIOD), PWM_USEC(pulse), 0);
 
-    ret = pwm_set(config->pwm_dev[0], 3, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[1])), 0);
-    if (ret < 0) {
-        return ret;
-    }
-
-    ret = pwm_set(config->pwm_dev[0], 2, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[2])), 0);
-    if (ret < 0) {
-        return ret;
-    }
-
-    ret = pwm_set(config->pwm_dev[1], 1, PWM_USEC(PWM_PERIOD), PWM_USEC(get_pulse(outputs[3])), 0);
-    if (ret < 0) {
-        return ret;
+        if (ret != 0) {
+            return ret;
+        }
     }
 
     return 0;
@@ -66,11 +60,15 @@ const struct control_output_api api = {
     .set = output_pwm_set
 };
 
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(pwmout), okay)
+
 struct output_pwm_data data;
 const struct output_pwm_config config = {
-    .pwm_dev = {
-        GET_PWM(pwm1),
-        GET_PWM(pwm2)
+    .pwms = {
+        PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwmout), 0),
+        PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwmout), 1),
+        PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwmout), 2),
+        PWM_DT_SPEC_GET_BY_IDX(DT_NODELABEL(pwmout), 3)
     }
 };
 
@@ -78,3 +76,5 @@ DEVICE_DT_INST_DEFINE(0, &output_pwm_init, NULL,
 		      &data, &config,
 		      POST_KERNEL, CONFIG_CONTROL_OUTPUT_PWM_INIT_PRIORITY,
 		      &api);
+
+#endif

@@ -32,9 +32,10 @@
 		rc-uart = &usart1;
 	};
 
-	pwmout: pwmout0 {
+	pwmout: pwmout {
 		compatible = "zephly,pwmout";
-		label = "PWM_OUT0";
+		pwms = <&pwm1 4 0 0>, <&pwm1 3 0 0>, <&pwm1 2 0 0>, <&pwm2 1 0 0>;
+		label = "PWMOUT";
 		status = "okay";
 	};
 };

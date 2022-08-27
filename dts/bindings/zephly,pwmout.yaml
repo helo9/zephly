@@ -4,3 +4,21 @@
 description: PWM Output
 
 compatible: "zephly,pwmout"
+
+include: base.yaml
+
+properties:
+    pwms:
+      required: false
+      type: phandle-array
+      description: PWM specifier driving the outputs.
+    
+    min-pulse:
+      required: false
+      type: int
+      description: Minimum pulse width (nanoseconds).
+
+    max-pulse:
+      required: false
+      type: int
+      description: Maximum pulse width (nanoseconds).
