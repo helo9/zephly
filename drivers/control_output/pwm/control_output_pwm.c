@@ -56,7 +56,7 @@ static int output_pwm_set(const struct device *dev, const float outputs[4]) {
     return 0;
 }
 
-const struct control_output_api api = {
+const struct control_output_api g_api = {
     .set = output_pwm_set
 };
 
@@ -75,6 +75,6 @@ const struct output_pwm_config config = {
 DEVICE_DT_INST_DEFINE(0, &output_pwm_init, NULL,
 		      &data, &config,
 		      POST_KERNEL, CONFIG_CONTROL_OUTPUT_PWM_INIT_PRIORITY,
-		      &api);
+		      &g_api);
 
 #endif
