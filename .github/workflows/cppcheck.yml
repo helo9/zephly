@@ -1,0 +1,20 @@
+# Copyright (c) 2022, Jannik Birk
+# SPDX-License-Identifier: Apache-2.0
+
+name: Run Cppcheck
+
+on: [push, pull_request]
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  path: zephly
+            - name: Install Cppcheck
+              run: sudo apt-get install cppcheck -y
+            - name: Run Cppcheck
+              working-directory: zephly
+              run: ./tools/cppcheck.sh
