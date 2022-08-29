@@ -65,7 +65,7 @@ static void joystick_rc_update(const struct device *dev, struct Command *rc_val)
     rc_val->armed  = true;
 }
 
-static struct joystick_rc_data data;
+static struct joystick_rc_data g_data;
 
 static const struct joystick_rc_config config;
 
@@ -74,6 +74,6 @@ struct rc_api joystick_rc_api = {
 };
 
 DEVICE_DT_INST_DEFINE(0, &joystick_rc_init, NULL,
-		      &data, &config,
+		      &g_data, &config,
 		      POST_KERNEL, CONFIG_ZEPHLY_JOYSTICK_RC_INIT_PRIORITY,
 		      &joystick_rc_api);
