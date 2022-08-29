@@ -1441,10 +1441,10 @@ bool srxlUpdateCommStats(bool isFade)
         }
     }
 
-    static uint8_t telemFadeCount = 0;
     // If we are allowed to send telemetry by the device downstream (i.e. any slave device)
     if(srxlRx.pTelemRcvr)
     {
+        static uint8_t telemFadeCount = 0;
         if(srxlRx.pTelemRcvr->channelMask == 0 || (srxlRx.pTelemRcvr->info & SRXL_DEVINFO_TELEM_FULL_RANGE) == 0)
         {
             // If our telemetry receiver missed channel data 3 frames in a row, switch
