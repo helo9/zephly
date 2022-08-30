@@ -52,7 +52,7 @@ static constexpr float get_motor_matrix_val(int i, int j) {
  * @param outputs the values modified by the function. holds values for each channel/motor with a range of 0.0 to 1.0
  */
 static void mix(const Command &cmd, float (&outputs)[4]) {
-    float inputs[4] = {cmd.roll, cmd.pitch, cmd.yaw, cmd.thrust};
+    const float inputs[4] = {cmd.roll, cmd.pitch, cmd.yaw, cmd.thrust};
 
     for (int i=0; i<4; i++) {
         /* reset outputs */
