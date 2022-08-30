@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2022 Jonathan Hahn
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&usart2 {
+    current-speed = < 100000 >;
+    parity = "even";
+    tx-invert;
+    dmas = <&dma1 1 0x0>;
+    dma-names = "tx";
+};
+
+&uart4 {
+    current-speed = < 100000 >;
+    parity = "even";
+    rx-invert;
+    rc: sbus {
+        compatible = "futaba,sbusreceiver";
+        label = "RECEIVER0";
+        status = "okay";
+    };
+};

@@ -1,0 +1,148 @@
+<html lang="en">
+    <head>
+        <title>RealTimeVisualization</title>
+        <script type="text/javascript" defer>
+            window.onload=() => {
+                
+                let canvas = getCanvas();
+
+                // get the context
+                let ctx = canvas.getContext('2d');
+
+                drawVisualization(ctx, canvas.width, canvas.height, [-1.0, 1.0, 0.5, -0.5]);
+
+                document.getElementById("thebutton").addEventListener('click', onOpenPort);
+                document.getElementById("runtests").addEventListener('click', onRunTests);
+
+                async function onOpenPort () {
+                    const port = await navigator.serial.requestPort();
+
+                    await port.open({ baudRate: 115200 });
+
+                    const textDecoder = new TextDecoderStream();
+                    const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+
+                    const reader = textDecoder.readable.getReader();
+
+                    try {
+                        var tmp = "";
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            tmp += value;
+
+                            lines = tmp.split('\n');
+
+                            if (lines.length >= 2){
+
+                                tmp = lines[lines.length - 1];
+
+                                [roll, pitch, throttle, yaw] = parseJoystickPositions(lines[lines.length - 2]);
+
+                                drawVisualization(ctx, canvas.width, canvas.height, [throttle, roll, pitch, yaw]);
+                            }
+                            
+                            if (done) {
+                                // Allow the serial port to be closed later.
+                                reader.releaseLock();
+                                break;
+                            }
+                                            
+                        }
+                    } catch(error) {
+                        return;
+                    }
+                }
+
+                function getCanvas() {
+                    return document.querySelector('#canvas');
+                }
+
+                function drawVisualization(ctx, width, height, values) {
+                    ctx.clearRect(0, 0, width, height);
+                    drawBackground(ctx);
+                    drawStickPositions(ctx, values[0], values[1], values[2], values[3]);
+                }
+
+                function drawBackground(ctx) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'red';
+
+                    ctx.strokeRect(25, 50, 200, 200);
+                    ctx.strokeRect(275, 50, 200, 200);
+                }
+
+                function drawStickPositions(ctx, throttle, roll, pitch, yaw) {
+                    
+                    throttle_coord = 150 - 100 * throttle;
+                    roll_coord = 375 + 100 * roll;
+                    pitch_coord = 150 - 100 * pitch;
+                    yaw_coord = 125 + 100 * yaw;
+
+                    // Dashed line
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'black';
+                    ctx.setLineDash([3, 6]);
+                    ctx.moveTo(yaw_coord, 50);
+                    ctx.lineTo(yaw_coord, 250);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'black';
+                    ctx.setLineDash([3, 6]);
+                    ctx.moveTo(25, pitch_coord);
+                    ctx.lineTo(225, pitch_coord);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'black';
+                    ctx.setLineDash([3, 6]);
+                    ctx.moveTo(roll_coord, 50);
+                    ctx.lineTo(roll_coord, 250);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'black';
+                    ctx.setLineDash([3, 6]);
+                    ctx.moveTo(275, throttle_coord);
+                    ctx.lineTo(475, throttle_coord);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.fillStyle = 'black';
+                    ctx.arc(yaw_coord, pitch_coord, 15, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.fillStyle = 'black';
+                    ctx.arc(roll_coord, throttle_coord, 15, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+
+                function parseJoystickPositions(input_line) {
+                    const reg = /Got roll:\s(-?\d+), pitch:\s(-?\d+), thrust:\s(-?\d+), yaw:\s(-?\d+), armed:\s(-?\d+)/
+                    
+                    const res = reg.exec(input_line)
+
+                    return [res[1], res[2], res[3], res[4]].map((elem) => elem/100);
+                }
+
+                function onRunTests() {
+                    input = "Got roll: 1, pitch: -1, thrust: -82, yaw: 0, armed: 1";
+                    
+                    [value1, value2, value3, value4] = parseJoystickPositions(input);
+
+                    console.log(value1, value2, value3, value4);
+
+                    alert("Tests succesful :)");
+                }
+                
+            }
+
+        </script>
+    </head>
+    <body>
+        <button id="thebutton">OpenPort</button>
+        <button id="runtests">Run Tests</button> <br>
+        <canvas width="500" height="300" id="canvas"></canvas>
+    </body>
+</html>
