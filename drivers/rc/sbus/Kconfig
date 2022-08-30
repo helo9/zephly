@@ -1,0 +1,10 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
+config ZEPHLY_SBUS_RC_DRIVER
+    bool "RC S.Bus driver"
+    depends on ZEPHLY_RC_COMMON
+    depends on UART_USE_RUNTIME_CONFIGURE
+    depends on UART_INTERRUPT_DRIVEN
+    help
+      Enable S.Bus RC receiver driver.
