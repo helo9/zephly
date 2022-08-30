@@ -1,3 +1,6 @@
+# Copyright (c) 2022 Jonathan Hahn
+# SPDX-License-Identifier: Apache-2.0
+
 config ZEPHLY_SRXL2_RC_DRIVER
     bool "RC (SRXL2) driver"
     depends on ZEPHLY_RC_COMMON
