@@ -44,7 +44,7 @@ void simulator_send_heartbeat() {
 
     uint16_t length = simulator_write_mavlink_hearbeat_buffer(buf);
 
-    if (length <= 0) {
+    if (length == 0) {
         return;
     }
 
@@ -56,7 +56,7 @@ void simulator_send_outputs(const float outputs[4]) {
 
     uint16_t length = simulator_write_mavlink_output_to_buffer(outputs, buf);
 
-    if (length <= 0) {
+    if (length == 0) {
         return;
     }
 
