@@ -49,7 +49,7 @@ uint16_t simulator_write_mavlink_output_to_buffer(const float outputs[4], uint8_
 int simulator_parse_message(uint8_t *buffer, size_t buffer_len, float gyro[3]) {
     mavlink_status_t status;
     mavlink_message_t msg;
-    uint8_t ret;
+    uint8_t ret = 0;
 
     for (size_t i=0; i<buffer_len; i++) {
         ret = mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &msg, &status);
