@@ -6,7 +6,7 @@
 
 /dts-v1/;
 #include <st/f3/stm32f303Xc.dtsi>
-#include <st/f3/stm32f303v(b-c)tx-pinctrl.dtsi>
+#include <st/f3/stm32f303r(b-c)tx-pinctrl.dtsi>
 
 / {
 	model = "SPRacing F3 Neo board";
@@ -35,6 +35,13 @@
 	aliases {
 		led0 = &led_0;
 		led1 = &led_1;
+	};
+
+	pwmout: pwmout {
+		compatible = "zephly,pwmout";
+		pwms = <&pwm3 4 0 0>, <&pwm3 2 0 0>, <&pwm3 3 0 0>, <&pwm3 1 0 0>;
+		label = "PWMOUT";
+		status = "okay";
 	};
 };
 
@@ -79,5 +86,15 @@
 		int-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
 		label = "MPU-6500";
 		status = "okay";
+	};
+};
+
+&timers3 {
+	status = "okay";
+	st,prescaler = <72>;
+	pwm3: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim3_ch1_pc6 &tim3_ch2_pc7 &tim3_ch3_pb0 &tim3_ch4_pb1>;
+		pinctrl-names = "default";
 	};
 };
