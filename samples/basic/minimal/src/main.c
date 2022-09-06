@@ -1,26 +1,47 @@
 #include <zephyr.h>
 #include <drivers/gpio.h>
 
-#define SLEEP_TIME_MS   1000
+#define SLEEP_TIME_MS   2000
 
-#define LED_NODE DT_ALIAS(led1)
+#define LED_NODE0 DT_ALIAS(led0)
+#define LED_NODE1 DT_ALIAS(led1)
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED_NODE, gpios);
+static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(LED_NODE0, gpios);
+static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(LED_NODE1, gpios);
 
 void main() {
+
+	printk("Starting Minimal Example\n");
+
 	int ret;
 
-	if (!device_is_ready(led.port)) {
+	if (!device_is_ready(led0.port) || !device_is_ready(led1.port)) {
 		return;
 	}
 
-	ret = gpio_pin_configure_dt(&led, GPIO_LINE_OPEN_DRAIN|GPIO_OUTPUT_ACTIVE);
+	ret = gpio_pin_configure_dt(&led0, GPIO_LINE_OPEN_DRAIN|GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return;
+	}
+
+	ret = gpio_pin_configure_dt(&led1, GPIO_LINE_OPEN_DRAIN|GPIO_OUTPUT_ACTIVE);
+	if (ret < 0) {
+		return;
+	}
+
+	ret = gpio_pin_toggle_dt(&led0);
 	if (ret < 0) {
 		return;
 	}
 
     while (true) {
-		ret = gpio_pin_toggle_dt(&led);
+		printk("Toggle LED :)\n");
+		ret = gpio_pin_toggle_dt(&led0);
+		if (ret < 0) {
+			return;
+		}
+
+		ret = gpio_pin_toggle_dt(&led1);
 		if (ret < 0) {
 			return;
 		}
