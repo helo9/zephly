@@ -21,13 +21,16 @@
 
     leds {
         compatible = "gpio-leds";
+		status = "okay";
         led_0: led_0 {
             gpios = <&gpiob 9 (GPIO_LINE_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
 			label = "User LED0";
+			status = "okay";
         };
         led_1: led_1 {
             gpios = <&gpiob 2 (GPIO_LINE_OPEN_DRAIN | GPIO_ACTIVE_HIGH)>;
 			label = "User LED1";
+			status = "okay";
         };
     };
 
@@ -45,7 +48,7 @@
 	};
 };
 
-&clk_hsi {
+&clk_hse {
 	clock-frequency = <DT_FREQ_M(8)>;
 	status = "okay";
 };
@@ -53,7 +56,7 @@
 &pll {
 	prediv = <1>;
 	mul = <9>;
-	clocks = <&clk_hsi>;
+	clocks = <&clk_hse>;
 	status = "okay";
 };
 
