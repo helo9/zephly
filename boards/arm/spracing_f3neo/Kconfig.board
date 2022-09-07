@@ -5,4 +5,4 @@
 
 config BOARD_SPRF3NEO
 	bool "SPRacing F3 Neo board"
-	depends on SOC_STM32F103XB
+	depends on SOC_STM32F303XC
