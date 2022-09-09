@@ -12,9 +12,23 @@
 	model = "SPRacing F3 Neo board";
 	compatible = "spracing,f3neo";
 
+	soc {
+		uart5: serial@40005000 {
+			compatible = "st,stm32-uart";
+			reg = <0x40005000 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x00100000>;
+			interrupts = <53 0>;
+			current-speed = <115200>;
+			pinctrl-0 = <&uart5_tx_pc12>;
+			pinctrl-names = "default";
+			status = "okay";
+			label = "UART_5";
+		};
+	};
+
     chosen {
-		zephyr,console = &usart2;
-		zephyr,shell-uart = &usart2;
+		zephyr,console = &uart5;
+		zephyr,shell-uart = &uart5;
 		zephyr,sram = &sram0;
         zephyr,flash = &flash0;
     };
@@ -33,7 +47,6 @@
 			status = "okay";
         };
     };
-
 
 	aliases {
 		led0 = &led_0;
@@ -71,8 +84,15 @@
 &usart2 {
 	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
 	pinctrl-names = "default";
-	current-speed = <115200>;
+	current-speed = < 115200 >;
+    parity = "even";
+    rx-invert;
 	status = "okay";
+	rc: sbus {
+        compatible = "futaba,sbusreceiver";
+        label = "RECEIVER0";
+        status = "disabled";
+    };
 };
 
 &spi1 {
